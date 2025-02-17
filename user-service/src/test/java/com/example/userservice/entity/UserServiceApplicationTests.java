@@ -1,4 +1,4 @@
-package com.example.userservice.userservice;
+package com.example.userservice.entity;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
