@@ -11,7 +11,7 @@
 ### PostgreSQL for docker
 - Step 1: Run container PostgreSQL by command:
 ```bash
-docker run --name postgres-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=userdb -p 5432:5432 -d postgres
+docker run --name postgres-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=user-service -p 5432:5432 -d postgres
 ```
 - Step 2: Run container for UI pgAdmin4 by command:
 ```bash
@@ -39,6 +39,6 @@ docker inspect pgadmin4-UI
 - Result and save: ![img_5.png](img_5.png) ![img_6.png](img_6.png)
 
 ### Start project user-service
-- Step 1: Create empty table users on pgAdmin4 
+- Step 1: (If any) Create empty table users in DB user-service
 - Step 2: Start project user-service
 - Step 3: Test postman or ThunderClient
