@@ -1,6 +1,7 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.entity.User;
+import com.example.userservice.enums.Role;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
 import jakarta.persistence.Cacheable;
@@ -11,8 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,36 +36,42 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User getUserById(long id) {
-        return userRepository.findById(id)
+    public User getUserById(UUID userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 
     @Override
     public User createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null) {
+            user.setRole(Role.USER); // Mặc định là USER
+        }
+        if (user.getCreatedAt() == null) {
+            user.setCreatedAt(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
         return userRepository.save(user);
     }
 
     @Override
-    public User updateUser(Long id, User user) {
-        User existingUser = userRepository.findById(id)
+    public User updateUser(UUID userId, User user) {
+        User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         existingUser.setUsername(user.getUsername());
         existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(user.getPassword());
+        existingUser.setPasswordHash(user.getPasswordHash());
         return userRepository.save(existingUser);
     }
 
     @Override
-    public User deleteUser(Long id) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        if(existingUser != null){
-            userRepository.deleteById(id);
+    public boolean deleteUser(UUID userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            return true;
         }
-        userRepository.deleteById(id);
-        return existingUser;
+        return false;
     }
 }
