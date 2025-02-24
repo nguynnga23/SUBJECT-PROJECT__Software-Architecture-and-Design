@@ -24,9 +24,9 @@ docker-compose up -d
 ![img_3.png](img_3.png)
 - Step 5: Enter username and password are 'root'
 ![img_4.png](img_4.png)
-- Step 6: Value of Host name/address is IPAddress of pgadmin4-UI in Docker. Enter this command to see PAddress of pgadmin4-UI:
+- Step 6: Value of Host name/address is IPAddress of postgres-container in Docker. Enter this command to see IPAddress of postgres-container:
 ```bash
-docker inspect pgadmin4-container
+docker inspect postgres-container
 ```
 - Result and save: ![img_5.png](img_5.png) ![img_6.png](img_6.png)
 - Step 7: Open console redis by command:
