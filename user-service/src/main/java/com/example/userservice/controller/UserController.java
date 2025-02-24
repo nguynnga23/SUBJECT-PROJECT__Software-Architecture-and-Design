@@ -1,8 +1,12 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.dto.AuthenticationRequestDto;
+import com.example.userservice.dto.AuthenticationResponseDto;
 import com.example.userservice.entity.User;
+import com.example.userservice.service.AuthenticationService;
 import com.example.userservice.service.UserRedisService;
 import com.example.userservice.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +18,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable UUID userId) {
@@ -30,10 +37,9 @@ public class UserController {
     }
 
     // As a registry --- Nguyen Chung must change createUser
-    @PostMapping()
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User newUser = userService.createUser(user);
-        return ResponseEntity.ok(newUser);
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
+        return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDto));
     }
 
     @PutMapping("/profile/{userId}")
