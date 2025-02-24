@@ -7,6 +7,7 @@
 - PostgreSQL/pgAdmin4 or container PostgreSQL/PgAdmin4 by Docker
 - IDE (IntelliJ IDEA, Eclipse, hoặc bất kỳ IDE nào hỗ trợ Java)
 - Postman or ThunderClient for VSCode
+- Redis
 
 ### PostgreSQL for docker
 - Step 1: Run container PostgreSQL by command:
@@ -14,7 +15,7 @@
 docker-compose up -d
 ```
 - Acceptable results:
-![img.png](img.png)
+![img_8.png](img_8.png)
 - Step 2: Access the path: Localhost:80 or Localhost and login with auth of UI pgAdmin4 before:
 ![img_1.png](img_1.png)
 - Step 3: Register server for UI: 
@@ -23,13 +24,17 @@ docker-compose up -d
 ![img_3.png](img_3.png)
 - Step 5: Enter username and password are 'root'
 ![img_4.png](img_4.png)
-- Step 6: Value of Host name/address is IPAddress of pgadmin4-UI in Docker
-- Enter this command to see PAddress of pgadmin4-UI:
+- Step 6: Value of Host name/address is IPAddress of postgres-container in Docker. Enter this command to see IPAddress of postgres-container:
 ```bash
-docker inspect pgadmin4-container
+docker inspect postgres-container
 ```
 - Result and save: ![img_5.png](img_5.png) ![img_6.png](img_6.png)
-
+- Step 7: Open console redis by command:
+```bash
+redis-cli
+```
+- Result:
+![img_9.png](img_9.png)
 ### Start project user-service
 - Step 1: (If any) Create empty table users in DB user-service
 - Step 2: Start project user-service
