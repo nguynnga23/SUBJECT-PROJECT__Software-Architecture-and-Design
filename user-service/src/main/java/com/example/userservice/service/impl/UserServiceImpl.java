@@ -5,12 +5,14 @@ import com.example.userservice.enums.Role;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
 import jakarta.persistence.Cacheable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -18,6 +20,8 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.GONE;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -52,19 +56,19 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
-    public User createUser(User user) {
-        if (user.getRole() == null) {
-            user.setRole(Role.USER); // define USER
-        }
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
-        }
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        User newUser = userRepository.save(user);
-        userRedisServiceImpl.save("USER_" + newUser.getUserId(), newUser, 10);
-        return newUser;
-    }
+//    @Override
+//    public User createUser(User user) {
+//        if (user.getRole() == null) {
+//            user.setRole(Role.USER); // define USER
+//        }
+//        if (user.getCreatedAt() == null) {
+//            user.setCreatedAt(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
+//        }
+//        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+//        User newUser = userRepository.save(user);
+//        userRedisServiceImpl.save("USER_" + newUser.getUserId(), newUser, 10);
+//        return newUser;
+//    }
 
     @Override
     public User updateUser(UUID userId, User user) {
@@ -87,5 +91,11 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(GONE, "The user account has been deleted or inactivated"));
+
     }
 }
