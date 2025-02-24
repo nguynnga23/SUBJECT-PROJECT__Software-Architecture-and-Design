@@ -1,10 +1,9 @@
-package vn.edu.iuh.fit.user_authentication_service_jwt.service;
+package com.example.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
