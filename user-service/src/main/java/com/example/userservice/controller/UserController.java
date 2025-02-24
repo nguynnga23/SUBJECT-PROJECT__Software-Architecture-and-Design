@@ -30,7 +30,7 @@ public class UserController {
     }
 
     // As a registry --- Nguyen Chung must change createUser
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User newUser = userService.createUser(user);
         return ResponseEntity.ok(newUser);
