@@ -39,3 +39,17 @@ redis-cli
 - Step 1: (If any) Create empty table users in DB user-service
 - Step 2: Start project user-service
 - Step 3: Test postman or ThunderClient
+
+***Dinh Nguyen Chung***
+
+**Register:**
+```angular2html
+http://localhost:8080/api/users/register
+```
+![img_11.png](img_11.png)
+
+**Login**
+```angular2html
+http://localhost:8080/api/users/login
+```
+![img_12.png](img_12.png)
