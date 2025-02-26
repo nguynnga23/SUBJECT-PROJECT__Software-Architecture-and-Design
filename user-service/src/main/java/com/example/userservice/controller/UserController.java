@@ -1,14 +1,12 @@
 package com.example.userservice.controller;
 
 import com.example.userservice.entity.User;
-import com.example.userservice.service.UserRedisService;
 import com.example.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
