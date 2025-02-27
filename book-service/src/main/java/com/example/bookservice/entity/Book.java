@@ -35,7 +35,6 @@ public class Book {
     @Column(name = "category", nullable = false, length = 50)
     private String category;
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate publishedDate;
 
