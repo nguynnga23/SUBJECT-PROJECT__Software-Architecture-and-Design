@@ -46,10 +46,62 @@ redis-cli
 ```angular2html
 http://localhost:8080/api/users/register
 ```
-![img_11.png](img_11.png)
+![img_13.png](img_13.png)
 
 **Login**
 ```angular2html
 http://localhost:8080/api/users/login
 ```
-![img_12.png](img_12.png)
+![img_14.png](img_14.png)
+Login sẽ trả về accessToken và refreshToken.accessToken có time là 30', refreshToken có thời gian 7 ngày.
+
+![img_15.png](img_15.png)
+
+### Khi accessToken hết hạn sẽ thực hiện thực hiện refreshToken 
+
+
+Chọn phương thức POST.
+
+Nhập URL:
+```angular2html
+http://localhost:8080/api/users/refresh-token
+```
+Chọn tab Body, chọn raw, và chọn định dạng JSON.
+
+Nhập body là refreshtoken, sử dụng refreshToken từ bước đăng nhập.
+
+Nhấn Send.
+
+
+![img_16.png](img_16.png)
+
+### Kiểm tra tính hợp lệ của access token mới 
+
+Lưu lại accessToken mới từ response (nếu đã refreshToken ) để thực hiện
+
+Method: GET
+
+URL: 
+```angular2html
+http://localhost:8080/api/users/profile/{userId}
+```
+
+Thay {userId} 
+
+Header:
+
+Authorization: Bearer new_access_token
+
+![img_17.png](img_17.png)
+
+### Logout
+Method : POST
+
+URL:
+```angular2html
+http://localhost:8080/api/users/logout
+```
+
+Lấy accessToken nhập vào Beer Token
+
+![img_18.png](img_18.png)

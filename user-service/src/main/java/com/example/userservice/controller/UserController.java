@@ -2,10 +2,14 @@ package com.example.userservice.controller;
 
 import com.example.userservice.dto.AuthenticationRequestDto;
 import com.example.userservice.dto.AuthenticationResponseDto;
+import com.example.userservice.dto.RefreshTokenRequestDto;
+import com.example.userservice.dto.RefreshTokenResponseDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.service.AuthenticationService;
 import com.example.userservice.service.UserRedisService;
 import com.example.userservice.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,16 +41,31 @@ public class UserController {
     }
 
     // As a registry --- Nguyen Chung must change createUser
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
+//        return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDto));
+//    }
+
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
-        return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDto));
+    public ResponseEntity<?> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
+        return authenticationService.authenticate(authenticationRequestDto);
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", ""); // Loại bỏ "Bearer " từ header
+        authenticationService.logout(jwtToken);
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequest) {
+        return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
     }
 
     @PutMapping("/profile/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable UUID userId, @RequestBody User user) {
         return ResponseEntity.ok(userService.updateUser(userId, user));
     }
-
 
 
     @DeleteMapping("/{userId}")
