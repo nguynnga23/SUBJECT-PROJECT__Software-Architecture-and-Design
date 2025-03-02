@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.validation.annotation.Validated;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -23,16 +24,21 @@ import java.time.Duration;
 @Setter
 @Getter
 @ConfigurationProperties(prefix = "jwt")
+@Validated
 public class JwtConfig {
 
     private RSAPrivateKey privateKey;
 
     private RSAPublicKey publicKey;
 
-    private Duration ttl;
+    private Duration accessTokenTtl; // Thời gian sống của access token
+    private Duration refreshTokenTtl; // Thời gian sống của refresh token
 
     @Bean
     public JwtEncoder jwtEncoder() {
+        if (privateKey == null || publicKey == null) {
+            throw new IllegalStateException("RSA keys must be configured");
+        }
         final var jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
 
         return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(jwk)));
@@ -40,12 +46,18 @@ public class JwtConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
+        if (publicKey == null) {
+            throw new IllegalStateException("Public key must be configured");
+        }
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
     @Bean
-    public JwtService jwtService(@Value("${spring.application.name}") final String appName, final JwtEncoder jwtEncoder) {
-        return new JwtService(appName, ttl, jwtEncoder);
+    public JwtService jwtService(@Value("${spring.application.name}") final String appName, final JwtEncoder jwtEncoder,final JwtDecoder jwtDecoder) {
+        if (accessTokenTtl == null || refreshTokenTtl == null) {
+            throw new IllegalStateException("Access token TTL and refresh token TTL must be configured");
+        }
+        return new JwtService(appName, accessTokenTtl,refreshTokenTtl, jwtEncoder,jwtDecoder);
     }
 
 }
