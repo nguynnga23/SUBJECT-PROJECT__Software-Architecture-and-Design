@@ -47,16 +47,20 @@ redis-cli
 http://localhost:8080/api/users/register
 ```
 ![img_13.png](img_13.png)
-
+#### Register Thất bại  (trùng userName)
+![img_20.png](img_20.png)
 **Login**
 ```angular2html
 http://localhost:8080/api/users/login
 ```
 ![img_14.png](img_14.png)
-Login sẽ trả về accessToken và refreshToken.accessToken có time là 30', refreshToken có thời gian 7 ngày.
+Thành công Login sẽ trả về accessToken và refreshToken.accessToken có time là 30', refreshToken có thời gian 7 ngày.
 
 ![img_15.png](img_15.png)
 
+Login thất bại 
+
+![img_19.png](img_19.png)
 ### Khi accessToken hết hạn sẽ thực hiện thực hiện refreshToken 
 
 
