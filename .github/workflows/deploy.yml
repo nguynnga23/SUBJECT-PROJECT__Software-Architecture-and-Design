@@ -2,20 +2,27 @@ name: Deploy Docusaurus to GitHub Pages
 
 on:
   push:
-    branches:
-      - 18-docs-setup-docusaurus-vs-mermaid-and-github-action  # Lắng nghe nhánh này thay vì main
+    branches: ["18-docs-setup-docusaurus-vs-mermaid-and-github-action"]  # Chạy khi có push lên main
+  workflow_dispatch:  # Cho phép chạy thủ công từ Actions tab
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,27 +40,17 @@ jobs:
           npm run build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3  # Đổi sang hành động phù hợp với GitHub Pages
         with:
-          name: docusaurus-build
-          path: docs/build  # Đảm bảo đúng đường dẫn
+          path: docs/build  # Đảm bảo đường dẫn đúng với output của build
 
-  deploy-pages:
-    needs: deploy
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: docusaurus-build
-          path: docs/build
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
