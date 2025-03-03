@@ -58,7 +58,7 @@ public class BookController {
         if (existingBook.isPresent() && !existingBook.get().getBookId().equals(bookId)) {
             return ResponseEntity.badRequest().body(Map.of("error", "ISBN already exists for another book"));
         }
-        
+
         try{
             return ResponseEntity.ok(bookService.updateBook(bookId, updateBook));
         } catch (RuntimeException e){
