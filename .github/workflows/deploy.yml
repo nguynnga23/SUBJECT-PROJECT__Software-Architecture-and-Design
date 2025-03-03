@@ -41,7 +41,7 @@ jobs:
   deploy-pages:
     needs: deploy
     runs-on: ubuntu-latest
-    environment: github-pages
+    # environment: docusaurus-build
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
