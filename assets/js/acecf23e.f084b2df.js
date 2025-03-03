@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmy_website=self.webpackChunkmy_website||[]).push([[1903],{1912:e=>{e.exports=JSON.parse('{"blogBasePath":"/SUBJECT-PROJECT__Software-Architecture-and-Design/blog","blogTitle":"Blog","authorsListPath":"/SUBJECT-PROJECT__Software-Architecture-and-Design/blog/authors"}')}}]);
