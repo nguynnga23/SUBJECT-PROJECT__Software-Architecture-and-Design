@@ -3,7 +3,7 @@ name: Deploy Docusaurus to GitHub Pages
 on:
   push:
     branches:
-      - 18-docs-create-diagrams-with-mermaid  # Lắng nghe nhánh này thay vì main
+      - 18-docs-setup-docusaurus-vs-mermaid-and-github-action  # Lắng nghe nhánh này thay vì main
 
 permissions:
   contents: read
