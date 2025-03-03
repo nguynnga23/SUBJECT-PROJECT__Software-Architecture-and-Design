@@ -14,10 +14,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("status", ex.getStatus().value());
-        response.put("message", ex.getMessage());
+//        response.put("status", ex.getStatus().value());
+//        response.put("message", ex.getMessage());
         response.put("errors", ex.getErrors());
-        response.put("requestBody", ex.getRequestBody()); // Thêm body của request vào response
+//        response.put("requestBody", ex.getRequestBody()); // Thêm body của request vào response
 
         return new ResponseEntity<>(response, ex.getStatus());
     }
