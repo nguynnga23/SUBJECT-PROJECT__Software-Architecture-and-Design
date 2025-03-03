@@ -47,20 +47,6 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User createUser(User user) {
-        if (user.getRole() == null) {
-            user.setRole(Role.USER); // define USER
-        }
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
-        }
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        User newUser = userRepository.save(user);
-        userRedisServiceImpl.save("USER_" + newUser.getUserId(), newUser, 10);
-        return newUser;
-    }
-
-    @Override
     public User updateUser(UUID userId, User user) {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found");
