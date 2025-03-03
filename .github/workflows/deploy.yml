@@ -18,21 +18,25 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4  # Cập nhật lên v4
+        uses: actions/setup-node@v4
         with:
           node-version: 16
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd docs
+          npm install
 
       - name: Build Docusaurus
-        run: npm run build
+        run: |
+          cd docs
+          npm run build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4  # Cập nhật lên v4
+        uses: actions/upload-artifact@v4
         with:
           name: docusaurus-build
-          path: ./build
+          path: docs/build  # Đảm bảo đúng đường dẫn
 
   deploy-pages:
     needs: deploy
@@ -42,7 +46,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4  # Cập nhật lên v4
+        uses: actions/download-artifact@v4
         with:
           name: docusaurus-build
           path: ./build
