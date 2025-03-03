@@ -2,12 +2,23 @@ package com.example.userservice.service;
 
 import com.example.userservice.dto.AuthenticationRequestDto;
 import com.example.userservice.dto.AuthenticationResponseDto;
+import com.example.userservice.dto.RefreshTokenRequestDto;
+import com.example.userservice.dto.RefreshTokenResponseDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
@@ -16,14 +27,57 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final Set<String> blacklistedTokens = new HashSet<>(); // Danh sách đen token
 
-    public AuthenticationResponseDto authenticate(final AuthenticationRequestDto request) {
+    //Đăng xuất
+    public void logout(String token) {
+        blacklistedTokens.add(token); // Thêm token vào danh sách đen
+    }
+    // Kiểm tra token có bị thu hồi không
+    public boolean isTokenBlacklisted(String token) {
+        return blacklistedTokens.contains(token); // Kiểm tra token có trong danh sách đen không
+    }
+
+// Đăng nhập
+public ResponseEntity<?> authenticate(final AuthenticationRequestDto request) {
+    try {
         final var authToken = UsernamePasswordAuthenticationToken.unauthenticated(request.username(), request.passwordHash());
-        final var authentication = authenticationManager.authenticate(authToken);
+        authenticationManager.authenticate(authToken);
 
-        final var token = jwtService.generateToken(request.username());
+        // Tạo access token và refresh token
+        String accessToken = jwtService.generateToken(request.username());
+        String refreshToken = jwtService.generateRefreshToken(request.username());
+
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return new AuthenticationResponseDto(token,user.getEmail(), user.getFullName());
+
+        return ResponseEntity.ok(new AuthenticationResponseDto(accessToken, refreshToken, user.getEmail(), user.getFullName()));
+    } catch (BadCredentialsException e) {
+        return ResponseEntity.status(401).body(Map.of(
+                "error", "Unauthorized",
+                "message", "Wrong username or password!"
+        ));
+    } catch (AuthenticationException e) {
+        return ResponseEntity.status(401).body(Map.of(
+                "error", "Unauthorized",
+                "message", "Authentication failed! Please check the information."
+        ));
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(Map.of(
+                "error", "Internal Server Error",
+                "message", "Error during login. Please try again!"
+        ));
+    }
+}
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequest) {
+        // Giải mã refresh token và kiểm tra tính hợp lệ
+        String username = jwtService.extractUsername(refreshTokenRequest.refreshToken());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Tạo access token mới
+        String newAccessToken = jwtService.generateToken(user.getUsername());
+
+        return new RefreshTokenResponseDto(newAccessToken, refreshTokenRequest.refreshToken());
     }
 }
