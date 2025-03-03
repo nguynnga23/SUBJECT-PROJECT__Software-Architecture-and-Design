@@ -3,6 +3,7 @@ package com.example.bookservice.service;
 import com.example.bookservice.entity.Book;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BookService {
@@ -13,4 +14,5 @@ public interface BookService {
     Book updateBook(UUID bookID, Book book);
     boolean existsByIsbn(String isbn);
     List<Book> searchBookByKeyword(String keyword);
+    Optional<Book> findByIsbn(String isbn);
 }

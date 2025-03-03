@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -52,9 +53,12 @@ public class BookController {
 
     @PutMapping("/{bookId}")
     public ResponseEntity<?> updateBook(@PathVariable UUID bookId, @RequestBody Book updateBook){
-        if (bookService.existsByIsbn(updateBook.getIsbn())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "ISBN is exist"));
+        Optional<Book> existingBook = bookService.findByIsbn(updateBook.getIsbn());
+
+        if (existingBook.isPresent() && !existingBook.get().getBookId().equals(bookId)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "ISBN already exists for another book"));
         }
+        
         try{
             return ResponseEntity.ok(bookService.updateBook(bookId, updateBook));
         } catch (RuntimeException e){
