@@ -53,15 +53,16 @@ http://localhost:8080/api/users/register
 ```angular2html
 http://localhost:8080/api/users/login
 ```
-![img_14.png](img_14.png)
-Thành công Login sẽ trả về accessToken và refreshToken.accessToken có time là 30', refreshToken có thời gian 7 ngày.
+![img_26.png](img_26.png)
+Thành công Login sẽ trả về accessToken và accessToken có time là 30', refreshToken có thời gian 7 ngày được lưu trên cookies.
 
 ![img_15.png](img_15.png)
 
 Login thất bại 
 
-![img_19.png](img_19.png)
-### Khi accessToken hết hạn sẽ thực hiện thực hiện refreshToken 
+![img_25.png](img_25.png)
+
+### Khi thực hiện thực hiện refreshToken 
 
 
 Chọn phương thức POST.
@@ -70,14 +71,8 @@ Nhập URL:
 ```angular2html
 http://localhost:8080/api/users/refresh-token
 ```
-Chọn tab Body, chọn raw, và chọn định dạng JSON.
-
-Nhập body là refreshtoken, sử dụng refreshToken từ bước đăng nhập.
-
-Nhấn Send.
-
-
-![img_16.png](img_16.png)
+Sẽ tự lấy refreshToken trên cookies để lấy access Token mới
+![img_27.png](img_27.png)
 
 ### Kiểm tra tính hợp lệ của access token mới 
 
@@ -86,7 +81,7 @@ Lưu lại accessToken mới từ response (nếu đã refreshToken ) để th�
 Method: GET
 
 URL: 
-```angular2html
+```
 http://localhost:8080/api/users/profile/{userId}
 ```
 
@@ -96,7 +91,8 @@ Header:
 
 Authorization: Bearer new_access_token
 
-![img_17.png](img_17.png)
+![img_28.png](img_28.png)
+
 
 ### Logout
 Method : POST
@@ -106,6 +102,17 @@ URL:
 http://localhost:8080/api/users/logout
 ```
 
-Lấy accessToken nhập vào Beer Token
+Lấy accessToken gửi vào Beer Token
 
 ![img_18.png](img_18.png)
+
+### Kiểm tra accessToken ()
+```
+http://localhost:8080/api/users/protected-api
+```
+
+![img_23.png](img_23.png)
+
+Logout Thành công
+
+![img_24.png](img_24.png)
