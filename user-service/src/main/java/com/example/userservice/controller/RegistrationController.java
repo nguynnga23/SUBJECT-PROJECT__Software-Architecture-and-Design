@@ -26,7 +26,6 @@ public class RegistrationController {
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponseDto> registerUser(@Valid @RequestBody final RegistrationRequestDto registrationDTO) {
         final var registeredUser = userRegistrationService.registerUser(userRegistrationMapper.toEntity(registrationDTO));
-
         return ResponseEntity.ok(userRegistrationMapper.toRegistrationResponseDto(registeredUser));
     }
 
