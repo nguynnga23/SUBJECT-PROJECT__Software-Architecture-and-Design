@@ -46,10 +46,10 @@ public class User implements Serializable {
     @Column(name = "created_at", nullable = false, updatable = false)
     @Setter(AccessLevel.PRIVATE)
     @CreatedDate
-    private Instant createdAt;
+    private LocalDate createdAt;
 
     @Column(name = "update_at", nullable = false)
     @Setter(AccessLevel.PRIVATE)
     @LastModifiedDate
-    private Instant updatedAt;
+    private LocalDate updatedAt;
 }
