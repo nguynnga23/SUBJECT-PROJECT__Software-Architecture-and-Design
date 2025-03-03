@@ -36,6 +36,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             response.getWriter().write("Token is blacklisted");
             return;
         }
+        if (token != null && authenticationService.isTokenValid(token)) {
+            // Lấy thông tin người dùng từ token và lưu vào request attribute
+            String userId = authenticationService.getUserIdFromToken(token);
+            request.setAttribute("userId", userId);
+        }
 
         filterChain.doFilter(request, response);
     }

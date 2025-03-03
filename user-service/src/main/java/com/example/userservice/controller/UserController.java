@@ -30,21 +30,23 @@ public class UserController {
     private AuthenticationService authenticationService;
 
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable UUID userId) {
-        try {
-            User user = userService.getUserById(userId);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getUserById(@PathVariable UUID userId,HttpServletRequest request) {
+        // Lấy userId từ token
+        String userIdFromToken = (String) request.getAttribute("userId");
+
+        if (userIdFromToken == null || !userIdFromToken.equals(userId.toString())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized access"));
         }
 
+        User user = userService.getUserById(userId);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
+        }
     }
 
     // As a registry --- Nguyen Chung must change createUser
-//    @PostMapping("/login")
-//    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
-//        return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDto));
-//    }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
@@ -59,10 +61,11 @@ public class UserController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequest) {
+
         return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
     }
 
-    @PutMapping("/profile/{userId}")
+    @PutMapping("/  ")
     public ResponseEntity<User> updateUser(@PathVariable UUID userId, @RequestBody User user) {
         return ResponseEntity.ok(userService.updateUser(userId, user));
     }
