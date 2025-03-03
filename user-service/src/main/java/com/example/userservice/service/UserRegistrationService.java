@@ -38,7 +38,7 @@ public class UserRegistrationService {
         }
 
         if (user.getPasswordHash() == null || user.getPasswordHash().length() < 6) {
-            errors.put("password", "Password must be at least 6 characters");
+            errors.put("passwordHash", "Password must be at least 6 characters");
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {

@@ -6,6 +6,8 @@ import com.example.userservice.dto.RefreshTokenRequestDto;
 import com.example.userservice.dto.RefreshTokenResponseDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -65,7 +67,7 @@ public String getUserIdFromToken(String token) {
     }
 
 // Đăng nhập
-public ResponseEntity<?> authenticate(final AuthenticationRequestDto request) {
+public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , HttpServletResponse response) {
     try {
         final var authToken = UsernamePasswordAuthenticationToken.unauthenticated(request.username(), request.passwordHash());
         authenticationManager.authenticate(authToken);
@@ -76,6 +78,16 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request) {
 
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        // Lưu Refresh Token vào HttpOnly Cookie
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true); // Chỉ dùng HTTPS
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+
+        response.addCookie(refreshCookie);
+
+        // Trả về Access Token + thông tin user (KHÔNG gửi Refresh Token)
 
         return ResponseEntity.ok(new AuthenticationResponseDto(accessToken, refreshToken, user.getEmail(), user.getFullName()));
     } catch (BadCredentialsException e) {
@@ -95,15 +107,21 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request) {
         ));
     }
 }
-    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequest) {
+    public RefreshTokenResponseDto refreshToken(String  refreshToken) {
         // Giải mã refresh token và kiểm tra tính hợp lệ
-        String username = jwtService.extractUsername(refreshTokenRequest.refreshToken());
+        String username = jwtService.extractUsername(refreshToken);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Kiểm tra xem refresh token có hợp lệ không
+        if (!isTokenValid(refreshToken)) {
+            throw new InvalidBearerTokenException("Invalid refresh token");
+        }
 
         // Tạo access token mới
         String newAccessToken = jwtService.generateToken(user.getUsername());
 
-        return new RefreshTokenResponseDto(newAccessToken, refreshTokenRequest.refreshToken());
+        // Trả về response chứa access token mới và refresh token cũ
+        return new RefreshTokenResponseDto(newAccessToken, refreshToken);
     }
 }
