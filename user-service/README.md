@@ -74,7 +74,7 @@ http://localhost:8080/api/users/refresh-token
 Sẽ tự lấy refreshToken trên cookies để lấy access Token mới
 ![img_27.png](img_27.png)
 
-### Kiểm tra tính hợp lệ của access token mới 
+### Kiểm tra tính hợp lệ của access token mới va Get User
 
 Lưu lại accessToken mới từ response (nếu đã refreshToken ) để thực hiện
 
@@ -116,3 +116,17 @@ http://localhost:8080/api/users/protected-api
 Logout Thành công
 
 ![img_24.png](img_24.png)
+
+### Update User check token
+
+PUT
+
+```
+http://localhost:8080/api/users/{Id}
+```
+
+![img_29.png](img_29.png)
+
+Thieu hoac sai Token 
+
+![img_30.png](img_30.png)

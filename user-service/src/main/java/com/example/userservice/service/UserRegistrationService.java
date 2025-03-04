@@ -1,5 +1,6 @@
 package com.example.userservice.service;
 
+import com.example.userservice.dto.RegistrationRequestDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.enums.Role;
 import com.example.userservice.exception.ValidationException;
@@ -24,44 +25,50 @@ public class UserRegistrationService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public User registerUser(User user) {
+    public User registerUser(RegistrationRequestDto registrationRequestDto) {
         final Map<String, String> errors = new HashMap<>();
 
-        if (user.getUsername() == null || user.getUsername().isBlank()) {
+        // Validate username
+        if (registrationRequestDto.username() == null || registrationRequestDto.username().isBlank()) {
             errors.put("username", "Username cannot be empty");
         }
 
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
+        // Validate email
+        if (registrationRequestDto.email() == null || registrationRequestDto.email().isBlank()) {
             errors.put("email", "Email cannot be empty");
-        } else {
-            user.setEmail(user.getEmail().toLowerCase()); // Chuẩn hóa email
         }
 
-        if (user.getPasswordHash() == null || user.getPasswordHash().length() < 6) {
+        // Validate password
+        if (registrationRequestDto.passwordHash() == null || registrationRequestDto.passwordHash().length() < 6) {
             errors.put("passwordHash", "Password must be at least 6 characters");
         }
 
-        if (userRepository.existsByEmail(user.getEmail())) {
-            errors.put("email", "Email [%s] is already taken".formatted(user.getEmail()));
+        // Check if email is already taken
+        if (userRepository.existsByEmail(registrationRequestDto.email().toLowerCase())) {
+            errors.put("email", "Email [%s] is already taken".formatted(registrationRequestDto.email()));
         }
 
-        if (userRepository.existsByUsername(user.getUsername())) {
-            errors.put("username", "Username [%s] is already taken".formatted(user.getUsername()));
+        // Check if username is already taken
+        if (userRepository.existsByUsername(registrationRequestDto.username())) {
+            errors.put("username", "Username [%s] is already taken".formatted(registrationRequestDto.username()));
         }
 
+        // If there are validation errors, throw an exception
         if (!errors.isEmpty()) {
-            // Ghi log body khi đăng ký thất bại
-            logger.error("Registration failed for user: {}", user);
+            logger.error("Registration failed for user: {}", registrationRequestDto);
             logger.error("Errors: {}", errors);
-            throw new ValidationException(CONFLICT, errors,user);
+            throw new ValidationException(CONFLICT, errors, registrationRequestDto);
         }
 
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        // Create a new User entity from the RegistrationRequestDto
+        User user = new User();
+        user.setUsername(registrationRequestDto.username());
+        user.setEmail(registrationRequestDto.email().toLowerCase()); // Normalize email
+        user.setPasswordHash(passwordEncoder.encode(registrationRequestDto.passwordHash())); // Encode password
+        user.setFullName(registrationRequestDto.fullName());
+        user.setRole(registrationRequestDto.role() != null ? registrationRequestDto.role() : Role.USER); // Set default role if not provided
 
-        if (user.getRole() == null) {
-            user.setRole(Role.USER); // Gán role mặc định nếu không có
-        }
-
+        // Save the user to the database
         User savedUser = userRepository.save(user);
         logger.info("User [{}] registered successfully", savedUser.getUsername());
 

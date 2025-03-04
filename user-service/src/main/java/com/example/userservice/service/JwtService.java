@@ -28,6 +28,13 @@ public JwtService(
     this.refreshTokenTtl = refreshTokenTtl;
     this.jwtEncoder = jwtEncoder;
     this.jwtDecoder = jwtDecoder;
+    System.out.println("Access Token TTL: " + accessTokenTtl.getSeconds() + " seconds"); // Kiểm tra giá trị TTL
+    Instant now = Instant.now();
+    Instant expiry = now.plus(accessTokenTtl);
+
+    System.out.println("Token created at: " + now);
+    System.out.println("Token expires at: " + expiry);
+
 }
 
     public String generateToken(final String username) {
@@ -54,6 +61,13 @@ public JwtService(
     // Thêm phương thức extractUsername
     public String extractUsername(String token) {
         Jwt jwt = jwtDecoder.decode(token); // Giải mã token
+        Instant expiry = jwt.getExpiresAt();
+        Instant now = Instant.now();
+
+        if (expiry != null && expiry.isBefore(now)) {
+            throw new RuntimeException("Token đã hết hạn!");
+        }
         return jwt.getSubject(); // Trích xuất username từ subject
     }
+
 }

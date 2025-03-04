@@ -18,5 +18,5 @@ public class ValidationException extends ErrorResponseException {
         this.errors = errors;
         this.requestBody = requestBody; // Khởi tạo trường requestBody
     }
-
+    
 }
