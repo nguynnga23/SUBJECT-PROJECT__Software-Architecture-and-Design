@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,10 +53,6 @@ public class UserController {
 
     // As a registry --- Nguyen Chung must change createUser
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> authenticate(@RequestBody final AuthenticationRequestDto authenticationRequestDto) {
-//        return authenticationService.authenticate(authenticationRequestDto);
-//    }
 @PostMapping("/login")
 public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto authenticationRequestDto,
                                       HttpServletResponse response) {
@@ -87,12 +84,6 @@ public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto auth
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error","User or password wrong"));
 }
 
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-//        String jwtToken = token.replace("Bearer ", ""); // Loại bỏ "Bearer " từ header
-//        authenticationService.logout(jwtToken);
-//        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
-//    }
 @PostMapping("/logout")
 public ResponseEntity<?> logout(@RequestHeader("Authorization") String token,
                                 HttpServletResponse response) {
@@ -113,15 +104,6 @@ public ResponseEntity<?> logout(@RequestHeader("Authorization") String token,
     return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
 }
 
-//    @PostMapping("/refresh-token")
-//    public ResponseEntity<RefreshTokenResponseDto> refreshToken(@RequestHeader("Authorization") String authHeader) {
-//        // Loại bỏ "Bearer " từ header
-//        String refreshToken = authHeader.replace("Bearer ", "");
-//
-//        // Gọi service để refresh token
-//        RefreshTokenResponseDto response = authenticationService.refreshToken(refreshToken);
-//        return ResponseEntity.ok(response);
-//    }
 @GetMapping("/protected-api")
 public ResponseEntity<?> getProtectedData(@RequestHeader("Authorization") String authHeader) {
     try {
@@ -166,10 +148,74 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
     return ResponseEntity.ok(Map.of("accessToken", newTokens.accessToken()));
 }
 
-    @PutMapping("/  ")
-    public ResponseEntity<User> updateUser(@PathVariable UUID userId, @RequestBody User user) {
-        return ResponseEntity.ok(userService.updateUser(userId, user));
+//    @PutMapping("/  ")
+//    public ResponseEntity<User> updateUser(@PathVariable UUID userId, @RequestBody User user) {
+//        return ResponseEntity.ok(userService.updateUser(userId, user));
+//    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable UUID userId,
+                                        @RequestBody User user,
+                                        @RequestHeader("Authorization") String authHeader) {
+        try {
+            // Kiểm tra Authorization Header có tồn tại không
+            if (authHeader == null || authHeader.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Authorization header is missing!"));
+            }
+            // Lấy Access Token từ Header
+            String token = authHeader.replace("Bearer ", "");
+            // Kiểm tra token có rỗng không
+            if (token.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Token is empty!"));
+            }
+            // Kiểm tra Token hợp lệ
+            if (!authenticationService.isTokenValid(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid token!"));
+            }
+
+            // Lấy userId từ token
+            String userIdFromToken = authenticationService.getUserIdFromToken(token);
+
+            if (userIdFromToken == null || !userIdFromToken.equals(userId.toString())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized access!"));
+            }
+
+            // Lấy user hiện tại từ DB
+            User existingUser = userService.getUserById(userId);
+            if (existingUser == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found!"));
+            }
+
+            // Nếu  null, giữ nguyên cũ
+            if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
+                user.setPasswordHash(existingUser.getPasswordHash());
+            }
+            if(user.getUsername() == null || user.getUsername().isEmpty()) {
+                user.setUsername(existingUser.getUsername());
+            }
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                user.setEmail(existingUser.getEmail());
+            }
+            if(user.getFullName() == null || user.getFullName().isEmpty()) {
+                user.setFullName(existingUser.getFullName());
+            }
+            if (user.getRole()==null || user.getRole().describeConstable().isEmpty() )
+                user.setRole(existingUser.getRole());
+
+            // Giu nguuyen created_at
+            user.setCreatedAt(existingUser.getCreatedAt());
+            // Cập nhật thông tin user
+            user.setUpdatedAt(LocalDate.now());
+            User updatedUser = userService.updateUser(userId, user);
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while updating the user."));
+        }
     }
+
+
 
 
     @DeleteMapping("/{userId}")
