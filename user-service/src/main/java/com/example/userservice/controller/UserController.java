@@ -130,7 +130,7 @@ public ResponseEntity<?> getProtectedData(@RequestHeader("Authorization") String
 public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
                                       HttpServletResponse response) {
     if (refreshToken == null || refreshToken.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Không có Refresh Token.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No Refresh Token.");
     }
 
     // Gọi service để refresh token
