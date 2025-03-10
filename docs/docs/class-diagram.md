@@ -7,32 +7,14 @@ classDiagram
     %% ====== USER SERVICE ====== %%
     class User {
         +id: UUID
+        +username: String
         +fullName: String
-        +dob: Date
         +gender: Enum
         +phoneNumber: String
-        +address: String
         +email: String
         +password: String
-        +roleId: TinyInt
+        +role: Enum
         +isActive: Boolean
-    }
-
-    class Role {
-        +id: TinyInt
-        +name: String
-    }
-
-    class Librarian {
-        +userId: UUID
-        +department: String
-        +position: String
-        +workplace: String
-    }
-
-    class Reader {
-        +userId: UUID
-        +studentId: String
     }
 
     %% ====== BOOK SERVICE ====== %%
@@ -66,12 +48,13 @@ classDiagram
     %% ====== BORROWING SERVICE ====== %%
     class ReaderRequest {
         +id: UUID
-        +userId: UUID
+        +readerId: UUID
+        +librarianId: UUID
         +status: Enum
         +dateBorrowed: Date
         +dateReturned: Date
+        +returnDate: Date
         +penaltyFee: Double
-        +notes: Text
         +createdAt: DateTime
         +updatedAt: DateTime
         +borrowingPeriod: Int
@@ -83,7 +66,7 @@ classDiagram
     }
 
     %% ====== INVENTORY SERVICE ====== %%
-   class BookCopy {
+    class BookCopy {
         +id: UUID
         +bookId: UUID
         +inventoryId: UUID
@@ -91,7 +74,6 @@ classDiagram
         +location: String
         +status: Enum
     }
-
 
     class Inventory {
         +id: UUID
@@ -104,6 +86,13 @@ classDiagram
     }
 
     %% ====== NOTIFICATION SERVICE ====== %%
+ class NotificationEvent {
+        +eventId: UUID
+        +eventType: Enum
+        +eventData: JSON
+        +createdAt: DateTime
+    }
+
     class Notification {
         +id: UUID
         +userId: UUID
@@ -113,12 +102,16 @@ classDiagram
         +createdAt: DateTime
     }
 
-    %% ====== RELATIONSHIPS ====== %%
-    User "1" --> "1" Role : has
-    User "1" <|-- Librarian
-    User "1" <|-- Reader
+    class NotificationTemplate {
+        +id: UUID
+        +type: Enum
+        +name: String
+        +content: Text
+    }
 
-    Reader "1" --> "many" ReaderRequest : makes
+   %% ====== RELATIONSHIPS ====== %%
+    User "1" --> "many" ReaderRequest : makes
+    User "1" --> "many" ReaderRequest : approves
     ReaderRequest "1" --> "many" ReaderRequestDetail : contains
     ReaderRequestDetail "many" --> "1" BookCopy : includes
     Book "1" <-- "many" BookCopy : consists of
@@ -131,42 +124,33 @@ classDiagram
     Inventory "1" --> "many" BookCopy : manages
 
     Notification "many" --> "1" User : sent to
+    NotificationEvent "many" --> "1" Notification : triggers
+    NotificationTemplate "1" --> "many" Notification : uses
+
 ```
 
 
-**1️⃣ User Service**
+**1. User Service:** Quản lý thông tin người dùng.
 
-- User: Chứa thông tin người dùng.
+- Bảng: User
+- Cơ sở dữ liệu: user_service_db
 
-- Role: Xác định vai trò của người dùng (Admin, Reader, Librarian,...).
+**2. Book Service:** Quản lý thông tin sách, thể loại và tác giả.
 
-- Librarian: Người quản lý thư viện (mở rộng từ User).
+- Bảng: Book, Category, Author, BookAuthor
+- Cơ sở dữ liệu: book_service_db
 
-- Reader: Độc giả thư viện (mở rộng từ User).
+**3. Borrowing Service:** Quản lý các yêu cầu mượn sách của độc giả.
 
-**2️⃣ Book Service**
+- Bảng: ReaderRequest, ReaderRequestDetail
+- Cơ sở dữ liệu: borrowing_service_db
 
-- Book: Chứa thông tin sách.
+**4. Inventory Service:** Quản lý thông tin về các bản sao sách và tình trạng kho.
 
-- Category: Thể loại sách.
+- Bảng: BookCopy, Inventory
+- Cơ sở dữ liệu: inventory_service_db
 
-- Author: Tác giả sách.
+**5. Notification Service:** Quản lý các sự kiện và thông báo gửi đến người dùng.
 
-- BookAuthor: Liên kết giữa sách và tác giả.
-
-**3️⃣ Borrowing Service**
-
-- ReaderRequest: Đơn mượn/trả sách.
-
-- ReaderRequestDetail: Danh sách các bản sao sách trong đơn mượn.
-
-**4️⃣ Inventory Service**
-
-- BookCopy: Quản lý từng bản sao của sách (định danh bằng copyCode).
-
-- Inventory: Theo dõi tổng số lượng sách, số lượng sách có sẵn, bị mất hoặc hỏng.
-
-**5️⃣ Notification Service**
-
-- Notification: Gửi thông báo cho người dùng về các sự kiện quan trọng.
-
+- Bảng: NotificationEvent, Notification, NotificationTemplate
+- Cơ sở dữ liệu: notification_service_db
