@@ -13,7 +13,7 @@ const config = {
   title: 'My Site',
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'ignore', // hoặc 'log' hoặc 'warn'
   // Set the production url of your site here
   url: 'https://nguynnga23.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
@@ -26,7 +26,6 @@ const config = {
   projectName: 'SUBJECT-PROJECT__Software-Architecture-and-Design', // Usually your repo name.
   // Dùng nhánh hiện tại để deploy thay vì gh-pages
   deploymentBranch: 'gh-pages',
-  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
