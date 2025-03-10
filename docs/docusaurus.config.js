@@ -13,7 +13,7 @@ const config = {
   title: 'My Site',
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
-
+  onBrokenLinks: 'warn',
   // Set the production url of your site here
   url: 'https://nguynnga23.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
