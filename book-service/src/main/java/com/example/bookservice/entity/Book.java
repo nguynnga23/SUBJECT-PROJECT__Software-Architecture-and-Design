@@ -1,6 +1,7 @@
 package com.example.bookservice.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,8 +42,9 @@ public class Book {
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 
-    @OneToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    @JsonManagedReference
     private Category category;
 
     @Column(name = "year_published", updatable = false)
@@ -51,12 +53,13 @@ public class Book {
     @Column(name = "publisher", updatable = false)
     private String publisher;
 
-    @ManyToAny
+    @ManyToMany
     @JoinTable(
             name = "book_author",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
+    @JsonManagedReference
     private Set<Author> authors = new HashSet<>();
 
 }

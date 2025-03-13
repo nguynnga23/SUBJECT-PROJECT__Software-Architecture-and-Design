@@ -25,11 +25,6 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author getAuthorById(UUID id) {
-        return authorRepository.findById(id).orElse(null);
-    }
-
-    @Override
     public Author updateAuthor(Author author) {
         Author newAuthor = authorRepository.findById(author.getId()).get();
         newAuthor.setName(author.getName());
