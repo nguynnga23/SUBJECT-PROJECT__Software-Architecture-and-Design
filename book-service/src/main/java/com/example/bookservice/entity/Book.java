@@ -20,26 +20,32 @@ import java.util.UUID;
 public class Book {
     @Id
     @GeneratedValue
-    @Column(name = "book_id", updatable = false, nullable = false)
-    private UUID bookId;
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
+
+    @Column(name = "book_code", length = 20, nullable = false)
+    private String bookCode;
 
     @Column(name = "title", nullable = false, length = 50)
     private String title;
 
-    @Column(name = "author", nullable = false, length = 50)
-    private String author;
+    @Column(name = "topic", length = 50)
+    private String topic;
 
-    @Column(name = "isbn", nullable = false, unique = true, length = 20)
-    private String isbn;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
-    @Column(name = "category", nullable = false, length = 50)
-    private String category;
+    @Column(name = "note", columnDefinition = "TEXT")
+    private String note;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDate publishedDate;
+    @OneToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private Category category;
 
-    @Column(name = "total_copies")
-    private int totalCopies;
-    @Column(name = "available_copies")
-    private int availableCopies;
+    @Column(name = "year_published", updatable = false)
+    private int yearPublished;
+
+    @Column(name = "publisher", updatable = false)
+    private String publisher;
+
 }
