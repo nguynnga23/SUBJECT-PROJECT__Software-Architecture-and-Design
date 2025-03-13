@@ -2,13 +2,14 @@ package com.example.userservice.entity;
 
 import com.example.userservice.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -18,10 +19,11 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id", updatable = false, nullable = false)
     private UUID userId;
 
@@ -41,7 +43,13 @@ public class User implements Serializable {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Setter(AccessLevel.PUBLIC)
+    @CreatedDate
     private LocalDate createdAt;
+
+    @Column(name = "update_at", nullable = false)
+    @Setter(AccessLevel.PUBLIC)
+    @LastModifiedDate
+    private LocalDate updatedAt;
 }
