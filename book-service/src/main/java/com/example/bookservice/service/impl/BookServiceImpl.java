@@ -45,14 +45,14 @@ public class BookServiceImpl implements BookService {
         if(!bookRepository.existsById(bookID)) {
             throw new RuntimeException("Book does not exist");
         }
-        book.setBookId(bookID);
+        book.setId(bookID);
         Book updatedBook = bookRepository.save(book);
         return updatedBook;
     }
 
     @Override
-    public boolean existsByIsbn(String isbn) {
-        return bookRepository.existsByIsbn(isbn);
+    public boolean existsByBookCode(String bookCode) {
+        return bookRepository.existsByBookCode(bookCode);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> findByIsbn(String isbn) {
-        return bookRepository.findByIsbn(isbn);
+    public Optional<Book> findByBookCode(String bookCode) {
+        return bookRepository.findByBookCode(bookCode);
     }
 }
