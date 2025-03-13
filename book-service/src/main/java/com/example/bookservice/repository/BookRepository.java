@@ -13,11 +13,13 @@ import java.util.UUID;
 @Repository
 public interface BookRepository extends JpaRepository<Book, UUID> {
     boolean existsByBookCode(String bookCode);
-    @Query("SELECT b FROM Book b WHERE " +
-            "LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(b.category) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Book> searchByKeyword(@Param("keyword") String keyword);
+    @Query("SELECT DISTINCT b FROM Book b " +
+            "LEFT JOIN b.category c " +
+            "LEFT JOIN b.authors a " +
+            "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<Book> searchBooks(@Param("query") String keyword);
 
     Optional<Book> findByBookCode(String bookCode);
 }

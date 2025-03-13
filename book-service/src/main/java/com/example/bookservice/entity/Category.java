@@ -1,11 +1,14 @@
 package com.example.bookservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +26,7 @@ public class Category {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "category", cascade = CascadeType.ALL)
-    private Book book;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Set<Book> books = new HashSet<>();
 }

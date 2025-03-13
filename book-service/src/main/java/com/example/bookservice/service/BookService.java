@@ -13,6 +13,7 @@ public interface BookService {
     boolean deleteBook(UUID bookID);
     Book updateBook(UUID bookID, Book book);
     boolean existsByBookCode(String bookCode);
-    List<Book> searchBookByKeyword(String keyword);
+    List<Book> searchBooks(String keyword);
     Optional<Book> findByBookCode(String bookCode);
+    Book addAuthorsToBook(UUID bookId, List<UUID> authorIds);
 }
