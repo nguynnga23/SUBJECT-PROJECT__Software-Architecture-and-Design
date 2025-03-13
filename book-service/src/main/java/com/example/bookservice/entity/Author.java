@@ -6,15 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "category")
+@Table(name = "author")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class Category {
+@AllArgsConstructor
+public class Author {
     @Id
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
@@ -23,6 +25,6 @@ public class Category {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "category", cascade = CascadeType.ALL)
-    private Book book;
+    @ManyToMany(mappedBy = "author_id")
+    private Set<Book> books = new HashSet<>();
 }
