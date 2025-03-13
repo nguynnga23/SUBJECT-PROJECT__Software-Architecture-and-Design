@@ -22,8 +22,8 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<?> addBook(@RequestBody Book book) {
-        if (bookService.existsByIsbn(book.getIsbn())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "ISBN is exist"));
+        if (bookService.existsByBookCode(book.getBookCode())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Book Code is exist"));
         }
         Book newBook = bookService.addBook(book);
         return ResponseEntity.ok(newBook);
@@ -53,9 +53,9 @@ public class BookController {
 
     @PutMapping("/{bookId}")
     public ResponseEntity<?> updateBook(@PathVariable UUID bookId, @RequestBody Book updateBook){
-        Optional<Book> existingBook = bookService.findByIsbn(updateBook.getIsbn());
+        Optional<Book> existingBook = bookService.findByBookCode(updateBook.getBookCode());
 
-        if (existingBook.isPresent() && !existingBook.get().getBookId().equals(bookId)) {
+        if (existingBook.isPresent() && !existingBook.get().getId().equals(bookId)) {
             return ResponseEntity.badRequest().body(Map.of("error", "ISBN already exists for another book"));
         }
 
