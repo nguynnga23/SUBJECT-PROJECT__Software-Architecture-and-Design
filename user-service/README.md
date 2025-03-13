@@ -39,3 +39,94 @@ redis-cli
 - Step 1: (If any) Create empty table users in DB user-service
 - Step 2: Start project user-service
 - Step 3: Test postman or ThunderClient
+
+***Dinh Nguyen Chung***
+
+**Register:**
+```angular2html
+http://localhost:8080/api/users/register
+```
+![img_13.png](img_13.png)
+#### Register Thất bại  (trùng userName)
+![img_20.png](img_20.png)
+**Login**
+```angular2html
+http://localhost:8080/api/users/login
+```
+![img_26.png](img_26.png)
+Thành công Login sẽ trả về accessToken và accessToken có time là 30', refreshToken có thời gian 7 ngày được lưu trên cookies.
+
+![img_15.png](img_15.png)
+
+Login thất bại 
+
+![img_25.png](img_25.png)
+
+### Khi thực hiện thực hiện refreshToken 
+
+
+Chọn phương thức POST.
+
+Nhập URL:
+```angular2html
+http://localhost:8080/api/users/refresh-token
+```
+Sẽ tự lấy refreshToken trên cookies để lấy access Token mới
+![img_27.png](img_27.png)
+
+### Kiểm tra tính hợp lệ của access token mới va Get User
+
+Lưu lại accessToken mới từ response (nếu đã refreshToken ) để thực hiện
+
+Method: GET
+
+URL: 
+```
+http://localhost:8080/api/users/profile/{userId}
+```
+
+Thay {userId} 
+
+Header:
+
+Authorization: Bearer new_access_token
+
+![img_28.png](img_28.png)
+
+
+### Logout
+Method : POST
+
+URL:
+```angular2html
+http://localhost:8080/api/users/logout
+```
+
+Lấy accessToken gửi vào Beer Token
+
+![img_18.png](img_18.png)
+
+### Kiểm tra accessToken ()
+```
+http://localhost:8080/api/users/protected-api
+```
+
+![img_23.png](img_23.png)
+
+Logout Thành công
+
+![img_24.png](img_24.png)
+
+### Update User check token
+
+PUT
+
+```
+http://localhost:8080/api/users/{Id}
+```
+
+![img_29.png](img_29.png)
+
+Thieu hoac sai Token 
+
+![img_30.png](img_30.png)
