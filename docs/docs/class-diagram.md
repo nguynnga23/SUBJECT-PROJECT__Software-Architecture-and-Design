@@ -117,7 +117,7 @@ classDiagram
     Book "1" <-- "many" BookCopy : consists of
     Book "1" <-- "many" BookAuthor : written by
     BookAuthor "many" --> "1" Author : has
-    Book "1" <-- "1" Category : belongs to
+    Book "many" <-- "1" Category : belongs to
 
     Book "1" --> "1" Inventory : tracked in
     BookCopy "1" --> "1" Inventory : counted in
