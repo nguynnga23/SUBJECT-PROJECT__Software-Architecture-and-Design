@@ -91,6 +91,7 @@ Khi bạn chọn kiến trúc **Microservices** cho toàn bộ hệ thống qu�
    - Spring Boot app với **Spring Kafka**.
    - Lắng nghe sự kiện từ Kafka, gửi thông báo (SMS/email).
    - Không có REST API trực tiếp.
+   ![Notification service](../static/img/notification_service.png)
 
 6. **Web/Mobile App**:
    - Client (không phải Spring Boot), giao tiếp với API Gateway qua HTTP.
@@ -101,6 +102,47 @@ Khi bạn chọn kiến trúc **Microservices** cho toàn bộ hệ thống qu�
 - **Message Queue**: Kafka để truyền sự kiện từ Borrowing Service đến Notification Service.
 - **Database**: PostgreSQL (Book, User), MongoDB (Borrowing).
 - **Load Balancing**: Spring Cloud LoadBalancer để phân tải nếu có nhiều instance.
+
+```mermaid
+flowchart TD;
+
+    %% Services
+    UserService["🧑‍💻 User Service (Auth + User Management)"]
+    BookService["📚 Book Service"]
+    BorrowingService["📖 Borrowing Service"]
+    InventoryService["📦 Inventory Service"]
+    NotificationService["📢 Notification Service"]
+    API_Gateway["🌍 API Gateway"]
+    Kafka["🟠 Kafka (Event Bus)"]
+    RabbitMQ["🐇 RabbitMQ (Message Queue)"]
+
+    %% REST API Calls (Synchronous)
+    API_Gateway -->|REST API| UserService
+    API_Gateway -->|REST API| BookService
+    API_Gateway -->|REST API| BorrowingService
+    API_Gateway -->|REST API| InventoryService
+    API_Gateway -->|REST API| NotificationService
+
+    BorrowingService -->|REST API| UserService
+    BorrowingService -->|REST API| InventoryService
+    BookService -->|REST API| InventoryService
+
+    %% Event-Driven Communication (Asynchronous)
+    BorrowingService -- "BookBorrowed Event" --> Kafka
+    Kafka -- "Consume Event" --> NotificationService
+    Kafka -- "Consume Event" --> InventoryService
+    InventoryService -- "BookAvailable Event" --> RabbitMQ
+    RabbitMQ -- "Consume Event" --> NotificationService
+
+    %% Authentication
+    API_Gateway -->|JWT Token| UserService
+
+    %% Service Discovery & Load Balancing
+    UserService -->|Service Registry| API_Gateway
+    BookService -->|Service Registry| API_Gateway
+    BorrowingService -->|Service Registry| API_Gateway
+
+```
 
 ### c. Sơ Đồ Kiến Trúc
 
