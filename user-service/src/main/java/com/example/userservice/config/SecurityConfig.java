@@ -1,6 +1,7 @@
 package com.example.userservice.config;
 
 import com.example.userservice.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +30,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http,JwtTokenFilter jwtTokenFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http,JwtTokenFilter jwtTokenFilter,CustomAuthenticationEntryPoint authEntryPoint ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF
                 .authorizeHttpRequests(auth -> auth
@@ -43,6 +44,19 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler()) // Xử lý lỗi truy cập bị từ chối
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class) // Thêm JwtTokenFilter
+//                .exceptionHandling(ex -> ex
+//                        .authenticationEntryPoint((request, response, authException) -> {
+//                            response.setContentType("application/json");
+//                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                            response.getWriter().write("{\"error\": \"Unauthorized access!\"}");
+//                        })
+//                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+//                            response.setContentType("application/json");
+//                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//                            response.getWriter().write("{\"error\": \"Access denied!\"}");
+//                        })
+//                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
                 .build(); // Xây dựng SecurityFilterChain
     }
 

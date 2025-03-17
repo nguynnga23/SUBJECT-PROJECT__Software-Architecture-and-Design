@@ -44,12 +44,12 @@ public class User implements Serializable {
     private Role role;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    @Setter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PUBLIC)
     @CreatedDate
-    private Instant createdAt;
+    private LocalDate createdAt;
 
     @Column(name = "update_at", nullable = false)
-    @Setter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PUBLIC)
     @LastModifiedDate
-    private Instant updatedAt;
+    private LocalDate updatedAt;
 }
