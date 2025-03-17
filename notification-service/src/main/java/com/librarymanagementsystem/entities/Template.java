@@ -14,12 +14,12 @@ import java.util.UUID;
 @Builder
 public class Template {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String type; // EMAIL, SMS, PUSH
+    private String type;
+
     private String name;
-    @Column(columnDefinition = "TEXT")
+
     private String content;
 }
 

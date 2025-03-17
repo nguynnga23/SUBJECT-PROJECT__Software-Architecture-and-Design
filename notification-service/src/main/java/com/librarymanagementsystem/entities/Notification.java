@@ -15,13 +15,18 @@ import java.util.UUID;
 @Builder
 public class Notification {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String recipient;
-    private String type; // EMAIL, SMS, PUSH
-    private UUID templateId;
-    private String status; // PENDING, SENT, FAILED
-    private LocalDateTime scheduledTime;
+    @Column(name = "user_id")
+    private UUID userId;
+
+    private String message;
+
+    private String type;
+
+    @Column(name = "is_read")
+    private boolean isRead;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

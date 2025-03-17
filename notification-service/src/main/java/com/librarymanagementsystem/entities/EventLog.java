@@ -15,12 +15,14 @@ import java.util.UUID;
 @Builder
 public class EventLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private UUID eventId;
 
-    private String eventType; // ORDER_PLACED, LOW_INVENTORY
-    @Column(columnDefinition = "JSONB")
-    private String payload;
-    private boolean processed;
+    @Column(name = "event_type")
+    private String eventType;
+
+    @Column(name = "event_data", columnDefinition = "jsonb")
+    private String eventData;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
