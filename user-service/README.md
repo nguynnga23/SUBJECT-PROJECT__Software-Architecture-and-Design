@@ -130,3 +130,29 @@ http://localhost:8080/api/users/{Id}
 Thieu hoac sai Token 
 
 ![img_30.png](img_30.png)
+
+### ChangePassword
+
+Endpoint: PUT
+```
+/api/users/{userId}/change-password
+```
+Header: Authorization: Bearer <token>
+
+![img_31.png](img_31.png)
+
+Invalid token
+
+![img_32.png](img_32.png)
+
+Wrong oldPpassWord
+
+![img_33.png](img_33.png)
+
+wrong userid
+
+![img_34.png](img_34.png)
+
+Changed successfully
+
+![img_35.png](img_35.png)

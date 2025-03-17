@@ -155,7 +155,7 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable UUID userId,
                                         @RequestBody User user,
-                                        @RequestHeader("Authorization") String authHeader) {
+                                        @RequestHeader("Authorization") String authHeader)  {
         try {
             // Kiểm tra Authorization Header có tồn tại không
             if (authHeader == null || authHeader.isBlank()) {
@@ -229,4 +229,67 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
                     .body(Map.of("error", "User not found"));
         }
     }
+//    Change PassWord
+    @PutMapping("/{userId}/change-password")
+    public ResponseEntity<?> changePassword(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, String> passwordRequest,
+            @RequestHeader("Authorization") String authHeader) {
+
+        try {
+            // Kiểm tra Authorization Header
+            if (authHeader == null || authHeader.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Authorization header is missing!"));
+            }
+
+            // Lấy Access Token từ Header
+            String token = authHeader.replace("Bearer ", "");
+            if (token.isEmpty() || !authenticationService.isTokenValid(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid token!"));
+            }
+
+            // Lấy userId từ token
+            String userIdFromToken = authenticationService.getUserIdFromToken(token);
+            if (userIdFromToken == null || !userIdFromToken.equals(userId.toString())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Unauthorized access!"));
+            }
+
+            // Lấy user từ DB
+            User user = userService.getUserById(userId);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "User not found!"));
+            }
+
+            // Kiểm tra dữ liệu đầu vào
+            String oldPassword = passwordRequest.get("oldPassword");
+            String newPassword = passwordRequest.get("newPassword");
+            if (oldPassword == null || newPassword == null || oldPassword.isBlank() || newPassword.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Old password and new password are required!"));
+            }
+
+            // Kiểm tra mật khẩu cũ có đúng không
+            if (!authenticationService.verifyPassword(oldPassword, user.getPasswordHash())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Old password is incorrect!"));
+            }
+
+            // Cập nhật mật khẩu mới (đã mã hóa)
+            String hashedNewPassword = authenticationService.hashPassword(newPassword);
+            user.setPasswordHash(hashedNewPassword);
+            user.setUpdatedAt(LocalDate.now());
+
+            // Lưu lại thông tin user
+            userService.updateUser(userId, user);
+
+            return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred while changing the password."));
+        }
+    }
+
 }

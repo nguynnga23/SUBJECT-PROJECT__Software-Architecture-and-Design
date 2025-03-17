@@ -15,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.stereotype.Service;
 
@@ -31,22 +32,23 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final Set<String> blacklistedTokens = new HashSet<>(); // Danh sách đen token
+    private final PasswordEncoder passwordEncoder; // Thêm dòng này
 
-//    Get userId By Token
-public String getUserIdFromToken(String token) {
-    try {
-        // Giải mã token và trích xuất username (hoặc userId) từ token
-        String username = jwtService.extractUsername(token);
-        // Tìm user trong database bằng username
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    //    Get userId By Token
+    public String getUserIdFromToken(String token) {
+        try {
+            // Giải mã token và trích xuất username (hoặc userId) từ token
+            String username = jwtService.extractUsername(token);
+            // Tìm user trong database bằng username
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Trả về userId của user
-        return user.getUserId().toString(); // Giả sử userId là UUID và được lưu trong đối tượng User
-    } catch (Exception e) {
-        throw new InvalidBearerTokenException("Invalid token: " + e.getMessage());
+            // Trả về userId của user
+            return user.getUserId().toString(); // Giả sử userId là UUID và được lưu trong đối tượng User
+        } catch (Exception e) {
+            throw new InvalidBearerTokenException("Invalid token: " + e.getMessage());
+        }
     }
-}
     //    Kiểm tra Token hợp lệ
     public boolean isTokenValid(String token) {
         try {
@@ -66,8 +68,8 @@ public String getUserIdFromToken(String token) {
         return blacklistedTokens.contains(token); // Kiểm tra token có trong danh sách đen không
     }
 
-// Đăng nhập
-public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , HttpServletResponse response) {
+    // Đăng nhập
+    public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , HttpServletResponse response) {
     try {
         final var authToken = UsernamePasswordAuthenticationToken.unauthenticated(request.username(), request.passwordHash());
         authenticationManager.authenticate(authToken);
@@ -124,4 +126,13 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         // Trả về response chứa access token mới và refresh token cũ
         return new RefreshTokenResponseDto(newAccessToken, refreshToken);
     }
+    //Change Password
+    public boolean verifyPassword(String rawPassword, String hashedPassword) {
+        return passwordEncoder.matches(rawPassword, hashedPassword);
+    }
+
+    public String hashPassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
 }
