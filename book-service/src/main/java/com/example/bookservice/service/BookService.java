@@ -12,7 +12,8 @@ public interface BookService {
     Book getBook(UUID bookID);
     boolean deleteBook(UUID bookID);
     Book updateBook(UUID bookID, Book book);
-    boolean existsByIsbn(String isbn);
-    List<Book> searchBookByKeyword(String keyword);
-    Optional<Book> findByIsbn(String isbn);
+    boolean existsByBookCode(String bookCode);
+    List<Book> searchBooks(String keyword);
+    Optional<Book> findByBookCode(String bookCode);
+    Book addAuthorsToBook(UUID bookId, List<UUID> authorIds);
 }
