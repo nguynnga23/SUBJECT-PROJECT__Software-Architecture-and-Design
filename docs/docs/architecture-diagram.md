@@ -8,7 +8,7 @@ Khi bạn chọn kiến trúc **Microservices** cho toàn bộ hệ thống qu�
 
 ---
 
-## 1. Tổng Quan Kiến Trúc Thiết Kế Phần Mềm
+## 1. Tổng Quan Thiết Kế Phần Mềm
 
 - **Ý nghĩa của Microservices**: Hệ thống được chia thành các dịch vụ nhỏ, độc lập (Book Service, User Service, Borrowing Service, Notification Service), mỗi dịch vụ chạy riêng biệt và giao tiếp qua API hoặc message queue.
 - **Vai trò của Spring Boot**: Spring Boot cung cấp nền tảng để triển khai từng Microservice nhanh chóng, với embedded server, cấu hình tự động, và tích hợp các công cụ như Spring Cloud, Spring Data, Spring Kafka.
