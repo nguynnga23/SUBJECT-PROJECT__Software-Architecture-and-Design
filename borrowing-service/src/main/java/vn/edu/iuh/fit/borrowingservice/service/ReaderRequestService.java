@@ -11,6 +11,7 @@ import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -92,6 +93,13 @@ public class ReaderRequestService {
 
         }
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
+        if(request.getReturnDate().isBefore(LocalDateTime.now())){
+//            throw new IllegalArgumentException("Overdue payment date, pay the fee");
+            request.setDateReturned(LocalDateTime.now());
+            request.setStatus(BorrowStatus.OVERDUE);
+            request.setUpdatedAt(LocalDateTime.now());
+            return readerRequestRepository.save(request);
+        }
         request.setDateReturned(LocalDateTime.now());
         request.setStatus(BorrowStatus.RETURNED);
         request.setUpdatedAt(LocalDateTime.now());
@@ -99,9 +107,24 @@ public class ReaderRequestService {
     }
 
     public ReaderRequest updatePenalty(UUID requestId, Double penaltyFee) {
+        if(!readerRequestRepository.findById(requestId).isPresent()){
+            throw  new IllegalArgumentException("Not found requestId");
+
+        }
+
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
-        request.setPenaltyFee(penaltyFee);
-        return readerRequestRepository.save(request);
+        if(request.getStatus().equals(BorrowStatus.OVERDUE))
+        {
+//           count days return late
+//            long overdueDays = ChronoUnit.DAYS.between(request.getReturnDate(), LocalDateTime.now());
+//            penaltyFee = overdueDays*50000.0;
+            request.setPenaltyFee(penaltyFee);
+            return readerRequestRepository.save(request);
+        }
+        else{
+            throw new IllegalArgumentException("Not found request have status OVERDUE");
+        }
+
     }
 
     public List<ReaderRequest> getBorrowHistory(UUID readerId) {
