@@ -26,7 +26,7 @@ public class ReaderRequestService {
         if (requestDTO.getReaderId() == null || requestDTO.getBookCopyIds() == null || requestDTO.getBookCopyIds().isEmpty()) {
             throw new IllegalArgumentException("Reader ID and The list of books must not be left blank.");
         }
-        if(requestDTO.getBorrowingPeriod()<=0 || requestDTO.getBorrowingPeriod() == null )
+        if( requestDTO.getBorrowingPeriod() == null  || requestDTO.getBorrowingPeriod()<=0 )
         {
             throw new IllegalArgumentException("The borrowing period must be greater than 0 and not left blank.");
         }
