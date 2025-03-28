@@ -25,7 +25,7 @@ public class ReaderRequestController {
 
     @PutMapping("/{requestId}/status")
     public ResponseEntity<ReaderRequest> updateStatus(@PathVariable UUID requestId, @RequestBody UpdateStatusDTO statusDTO) {
-        return ResponseEntity.ok(readerRequestService.updateStatus(requestId, statusDTO.getStatus()));
+        return ResponseEntity.ok(readerRequestService.updateStatus(requestId, statusDTO));
     }
 
     @PutMapping("/{requestId}/borrow")
