@@ -36,6 +36,12 @@ public class ReaderRequestService {
            request.setStatus(BorrowStatus.PENDING);
            request.setBorrowingPeriod(requestDTO.getBorrowingPeriod());
            request.setCreatedAt(LocalDateTime.now());
+           request.setUpdatedAt(LocalDateTime.now());
+//           Tiính ngày dự kiến trả return_date dựa vào period
+            int period = requestDTO.getBorrowingPeriod();
+            LocalDateTime return_date = LocalDateTime.now().plusDays(period);
+            request.setReturnDate(return_date);
+
            // Tạo danh sách ReaderRequestDetail từ danh sách bookCopyIds
            List<ReaderRequestDetail> requestDetails = requestDTO.getBookCopyIds().stream().map(bookCopyId -> {
                ReaderRequestDetail detail = new ReaderRequestDetail();
@@ -64,6 +70,7 @@ public class ReaderRequestService {
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
         request.setStatus(statusDTO.getStatus());
         request.setLibrarianId(statusDTO.getLibrarianId());
+        request.setUpdatedAt(LocalDateTime.now());
         return readerRequestRepository.save(request);
     }
 
@@ -75,13 +82,19 @@ public class ReaderRequestService {
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
         request.setDateBorrowed(LocalDateTime.now());
         request.setStatus(BorrowStatus.BORROWED);
+        request.setUpdatedAt(LocalDateTime.now());
         return readerRequestRepository.save(request);
     }
 
     public ReaderRequest updateReturnDate(UUID requestId) {
+        if(!readerRequestRepository.findById(requestId).isPresent()){
+            throw  new IllegalArgumentException("Not found requestId");
+
+        }
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
         request.setDateReturned(LocalDateTime.now());
         request.setStatus(BorrowStatus.RETURNED);
+        request.setUpdatedAt(LocalDateTime.now());
         return readerRequestRepository.save(request);
     }
 
