@@ -2,13 +2,16 @@ package vn.edu.iuh.fit.borrowingservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.util.EnumUtils;
 import vn.edu.iuh.fit.borrowingservice.DTO.ReaderRequestDTO;
+import vn.edu.iuh.fit.borrowingservice.DTO.UpdateStatusDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequestDetail;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -50,9 +53,17 @@ public class ReaderRequestService {
        }
     }
 
-    public ReaderRequest updateStatus(UUID requestId, BorrowStatus status) {
+    public ReaderRequest updateStatus(UUID requestId, UpdateStatusDTO statusDTO) {
+        if(!readerRequestRepository.findById(requestId).isPresent()){
+            throw  new IllegalArgumentException("Not found requestId");
+
+        }
+        if (!EnumSet.allOf(BorrowStatus.class).contains(statusDTO.getStatus())) {
+            throw new IllegalArgumentException("Invalid status: " + statusDTO.getStatus());
+        }
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
-        request.setStatus(status);
+        request.setStatus(statusDTO.getStatus());
+        request.setLibrarianId(statusDTO.getLibrarianId());
         return readerRequestRepository.save(request);
     }
 
