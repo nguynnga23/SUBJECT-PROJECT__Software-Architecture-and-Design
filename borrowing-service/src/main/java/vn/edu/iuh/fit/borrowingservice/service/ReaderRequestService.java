@@ -68,6 +68,10 @@ public class ReaderRequestService {
     }
 
     public ReaderRequest updateBorrowDate(UUID requestId) {
+        if(!readerRequestRepository.findById(requestId).isPresent()){
+            throw  new IllegalArgumentException("Not found requestId");
+
+        }
         ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
         request.setDateBorrowed(LocalDateTime.now());
         request.setStatus(BorrowStatus.BORROWED);
