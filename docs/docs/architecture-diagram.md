@@ -156,6 +156,50 @@ flowchart TD;
 
 ---
 
+```plantuml
+@startuml
+!define RECTANGLE class
+
+' Các thành phần chính
+RECTANGLE "Client" as Client
+RECTANGLE "API Gateway" as APIGateway
+RECTANGLE "Service Registry\n(Eureka/Consul)" as ServiceRegistry
+RECTANGLE "User Service" as UserService
+RECTANGLE "Book Service" as BookService
+RECTANGLE "Borrowing Service" as BorrowingService
+RECTANGLE "Inventory Service" as InventoryService
+RECTANGLE "Notification Service" as NotificationService
+RECTANGLE "Message Queue\n(Kafka/RabbitMQ)" as MessageQueue
+
+' Luồng giao tiếp chính
+
+' Client -> API Gateway -> Services
+Client --> APIGateway : Sends Request
+APIGateway --> ServiceRegistry : Queries Service
+APIGateway --> UserService : Routes
+APIGateway --> BookService : Routes
+APIGateway --> BorrowingService : Routes
+APIGateway --> InventoryService : Routes
+APIGateway --> NotificationService : Routes
+
+' Service đăng ký với Service Registry
+UserService --> ServiceRegistry : Registers
+BookService --> ServiceRegistry : Registers
+BorrowingService --> ServiceRegistry : Registers
+InventoryService --> ServiceRegistry : Registers
+NotificationService --> ServiceRegistry : Registers
+
+' Synchronous Communication (REST API)
+UserService --> BookService : REST API Call
+BorrowingService --> InventoryService : REST API Call
+
+' Asynchronous Communication (Event-driven)
+BorrowingService --> MessageQueue : Publishes Event\n(Book Borrowed)
+MessageQueue --> InventoryService : Updates Stock
+MessageQueue --> NotificationService : Sends Email
+
+@enduml
+```
 ## 4. Cách Spring Boot Hỗ Trợ Microservices
 
 ### a. Triển Khai Độc Lập
