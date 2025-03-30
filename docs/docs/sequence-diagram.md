@@ -62,3 +62,85 @@ end
 - Nếu token hợp lệ, `JwtFilter` gọi `JwtUtil.getClaims(token)` để lấy thông tin `Claims`, thêm id vào header, rồi chuyển tiếp request tới `NextFilter`.
 
 **6. Hoàn tất xử lý:** `NextFilter` tiếp tục xử lý request, và `Gateway` trả về response cho `Client`.
+
+
+## 2. JWT processing process in Spring Cloud Gateway and User Service
+
+```plantuml
+@startuml
+actor Client
+participant "API Gateway" as Gateway
+participant "JwtFilter" as JwtFilter
+participant "User Service" as UserService
+
+== Đăng nhập ==
+Client -> Gateway: POST /api/user/login\n{username, password}
+Gateway -> JwtFilter: filter(exchange)
+JwtFilter -> JwtFilter: Endpoint /login không cần xác thực
+JwtFilter -> UserService: Chuyển tiếp request
+UserService -> UserService: Xác thực username/password
+UserService -> UserService: Tạo JWT token
+UserService -> Gateway: {token: "eyJhbGciOiJIUzI1NiJ9..."}
+Gateway -> Client: {token: "eyJhbGciOiJIUzI1NiJ9..."}
+
+== Truy cập profile ==
+Client -> Gateway: GET /api/user/profile\nAuthorization: Bearer <token>
+Gateway -> JwtFilter: filter(exchange)
+JwtFilter -> JwtFilter: Endpoint /profile cần xác thực
+JwtFilter -> JwtFilter: Lấy token từ header
+JwtFilter -> UserService: validateToken(token)
+alt Token hợp lệ
+    JwtFilter -> UserService: getClaims(token)
+    JwtFilter -> JwtFilter: Thêm "id" vào header
+    JwtFilter -> UserService: Chuyển tiếp request với header "id"
+    UserService -> UserService: Lấy profile bằng userId
+    UserService -> Gateway: {username, email}
+    Gateway -> Client: {username, email}
+else Token không hợp lệ
+    JwtFilter -> Gateway: HTTP 400 Bad Request
+    Gateway -> Client: HTTP 400
+end
+
+@enduml
+```
+
+## 3. Student create a book borrowing request
+
+``` plantuml
+@startuml
+actor Student
+participant "API Gateway" as Gateway
+participant "JwtFilter" as JwtFilter
+participant "User Service" as UserService
+participant "Borrow Service" as BorrowService
+
+== Đăng nhập ==
+Student -> Gateway: POST /api/user/login\n{studentCode, password}
+Gateway -> JwtFilter: filter(exchange)
+JwtFilter -> JwtFilter: /login không cần xác thực
+JwtFilter -> UserService: Chuyển tiếp request
+UserService -> UserService: Xác thực sinh viên
+UserService -> UserService: Tạo JWT token\n(chứa studentId)
+UserService -> Gateway: {token}
+Gateway -> Student: {token}
+
+== Tạo phiếu mượn sách ==
+Student -> Gateway: POST /api/borrow/create\nAuthorization: Bearer <token>\n{bookId}
+Gateway -> JwtFilter: filter(exchange)
+JwtFilter -> JwtFilter: /create cần xác thực
+JwtFilter -> JwtFilter: Lấy token từ header
+JwtFilter -> UserService: validateToken(token)
+alt Token hợp lệ
+    JwtFilter -> UserService: getClaims(token)
+    JwtFilter -> JwtFilter: Thêm "studentId" vào header
+    JwtFilter -> BorrowService: Chuyển tiếp request
+    BorrowService -> BorrowService: Tạo phiếu mượn sách
+    BorrowService -> Gateway: {borrowSlip}
+    Gateway -> Student: {borrowSlip}
+else Token không hợp lệ
+    JwtFilter -> Gateway: HTTP 400
+    Gateway -> Student: HTTP 400
+end
+
+@enduml
+```
