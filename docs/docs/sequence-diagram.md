@@ -202,6 +202,49 @@ JwtServer --> Client: 200 OK\nData
 
 @enduml
 ```
+
+### Stream with authentication and authorization
+```plantuml
+@startuml
+actor Client
+participant "API Gateway" as Gateway
+participant "User Service" as UserService
+participant "Database (PostgreSQL)" as DB
+participant "Redis" as Cache
+
+== Register ==
+Client -> Gateway: POST /register\n(username, password, email, ...)
+Gateway -> UserService: Forward request
+UserService -> DB: Save new user
+DB --> UserService: User saved
+UserService --> Gateway: 201 Created\n{userId}
+Gateway --> Client: 201 Created\n{userId}
+
+== Login ==
+Client -> Gateway: POST /login\n(username, password)
+Gateway -> UserService: Forward request
+UserService -> DB: Query user
+DB --> UserService: User data
+UserService -> UserService: Validate password\nGenerate JWT (userId, role)
+UserService -> Cache: Store refreshToken
+Cache --> UserService: OK
+UserService --> Gateway: 200 OK\n{accessToken}, Cookie: refreshToken
+Gateway --> Client: 200 OK\n{accessToken}, Cookie: refreshToken
+
+== Update Profile ==
+Client -> Gateway: PUT /users/{userId}\nAuthorization: Bearer <accessToken>\n(fullName, ...)
+Gateway -> Gateway: Validate token\nExtract userId, role
+Gateway -> UserService: Forward request
+UserService -> UserService: Check role (USER or ADMIN)\nCheck userId matches or ADMIN
+UserService -> DB: getUserById(userId)
+DB --> UserService: User data
+UserService -> DB: updateUser(userId, updatedData)
+DB --> UserService: Updated user
+UserService --> Gateway: 200 OK\nUpdated user
+Gateway --> Client: 200 OK\nUpdated user
+
+@enduml
+```
 ## 4. Student create a book borrowing request
 
 ``` plantuml
