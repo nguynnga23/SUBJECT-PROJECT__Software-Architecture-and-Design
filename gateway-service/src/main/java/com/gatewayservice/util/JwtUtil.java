@@ -5,24 +5,28 @@ import com.gatewayservice.exception.JwtTokenMissingException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
-import org.springframework.stereotype.Component;
 
-@Component
+import java.security.PublicKey;
+
 public class JwtUtil {
 
-    private final String SECRET_KEY = "secret-key"; // Đảm bảo đây là key bảo mật của bạn
+    private final PublicKey publicKey;
+
+    public JwtUtil(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
 
     public void validateToken(String token) throws JwtTokenMalformedException, JwtTokenMissingException {
         try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token);
         } catch (SignatureException e) {
-            throw new JwtTokenMalformedException("Invalid JWT token");
+            throw new JwtTokenMalformedException("Invalid JWT signature");
         } catch (Exception e) {
-            throw new JwtTokenMissingException("JWT token is missing");
+            throw new JwtTokenMissingException("JWT token validation failed: " + e.getMessage());
         }
     }
 
     public Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
     }
 }
