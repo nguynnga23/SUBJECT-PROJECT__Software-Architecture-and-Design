@@ -1,11 +1,9 @@
 package com.gatewayservice.filter;
 
-import java.util.List;
-import java.util.function.Predicate;
-
 import com.gatewayservice.exception.JwtTokenMalformedException;
 import com.gatewayservice.exception.JwtTokenMissingException;
 import com.gatewayservice.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -14,11 +12,10 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-
-
-
-import io.jsonwebtoken.Claims;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 @Component
 public class JwtAuthenticationFilter implements GatewayFilter {
@@ -29,44 +26,56 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        String path = request.getURI().getPath();
+        System.out.println("Request path: " + path); // Debug
 
-        // Cấu hình những endpoint không cần xác thực JWT (ví dụ: đăng nhập, đăng ký)
-        final List<String> apiEndpoints = List.of("/register", "/login");
+        // Danh sách endpoint công khai
+        final List<String> apiEndpoints = List.of(
+                "/api/v1/user-service/users/login",
+                "/api/v1/user-service/users/register"
+        );
 
-        // Kiểm tra xem request có phải là endpoint yêu cầu bảo mật hay không
+        // Kiểm tra xem request có cần bảo mật không
         Predicate<ServerHttpRequest> isApiSecured = r -> apiEndpoints.stream()
-                .noneMatch(uri -> r.getURI().getPath().contains(uri));
+                .noneMatch(uri -> r.getURI().getPath().equals(uri));
 
-        // Nếu là API cần bảo mật, thực hiện kiểm tra token
         if (isApiSecured.test(request)) {
             if (!request.getHeaders().containsKey("Authorization")) {
-                // Nếu không có header Authorization thì trả về Unauthorized
+                System.out.println("Missing Authorization header for path: " + path);
                 ServerHttpResponse response = exchange.getResponse();
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return response.setComplete();
             }
 
             // Lấy token từ header Authorization
-            final String token = request.getHeaders().getOrEmpty("Authorization").get(0);
+            final String authHeader = request.getHeaders().getFirst("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                System.out.println("Invalid Authorization header: " + authHeader);
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return response.setComplete();
+            }
+
+            final String token = authHeader.substring(7); // Bỏ "Bearer "
 
             try {
-                // Kiểm tra tính hợp lệ của token
                 jwtUtil.validateToken(token);
             } catch (JwtTokenMalformedException | JwtTokenMissingException e) {
-                // Nếu token không hợp lệ, trả về Bad Request
+                System.out.println("Token validation failed: " + e.getMessage());
                 ServerHttpResponse response = exchange.getResponse();
                 response.setStatusCode(HttpStatus.BAD_REQUEST);
                 return response.setComplete();
             }
 
-            // Nếu token hợp lệ, lấy claims và thêm id vào header
+            // Thêm thông tin từ claims vào header
             Claims claims = jwtUtil.getClaims(token);
             request = exchange.getRequest().mutate()
                     .header("id", String.valueOf(claims.get("id")))
                     .build();
+        } else {
+            System.out.println("Public endpoint, skipping authentication: " + path);
         }
 
-        // Tiếp tục xử lý request
         return chain.filter(exchange.mutate().request(request).build());
     }
 }
