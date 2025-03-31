@@ -167,6 +167,41 @@ Backend -> Frontend: Clear refreshToken cookie\nReturn success
 
 @enduml
 ```
+### Flow compares Session-based (default Spring Security) and JWT + Stateless
+```plantuml
+@startuml
+actor Client
+participant "Server (Session-based)" as SessionServer
+participant "Server (JWT + Stateless)" as JwtServer
+participant "Database" as DB
+
+== Session-based Login ==
+Client -> SessionServer: POST /login\n(username, password)
+SessionServer -> DB: Query user
+DB --> SessionServer: User data
+SessionServer -> SessionServer: Validate (AuthenticationManager)
+SessionServer -> SessionServer: Create session (JSESSIONID)
+SessionServer --> Client: 200 OK\nSet-Cookie: JSESSIONID
+
+== JWT + Stateless Login ==
+Client -> JwtServer: POST /login\n(username, password)
+JwtServer -> DB: Query user
+DB --> JwtServer: User data
+JwtServer -> JwtServer: Validate (AuthenticationService)
+JwtServer -> JwtServer: Generate JWT (accessToken, refreshToken)
+JwtServer --> Client: 200 OK\n{accessToken}, Cookie: refreshToken
+
+== Access Protected Resource ==
+Client -> SessionServer: GET /protected\nCookie: JSESSIONID
+SessionServer -> SessionServer: Check session
+SessionServer --> Client: 200 OK\nData
+
+Client -> JwtServer: GET /protected\nAuthorization: Bearer <accessToken>
+JwtServer -> JwtServer: Validate token (JwtTokenFilter)
+JwtServer --> Client: 200 OK\nData
+
+@enduml
+```
 ## 4. Student create a book borrowing request
 
 ``` plantuml
