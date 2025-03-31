@@ -103,8 +103,71 @@ end
 
 @enduml
 ```
+## 3. Register, Authentication, Login, Logout
+```plantuml
+@startuml
+autonumber
 
-## 3. Student create a book borrowing request
+actor User
+participant Frontend as "Frontend (React/Angular/Vue)"
+participant Backend as "Backend (Spring Boot)"
+database Database as "PostgreSQL"
+participant Redis as "Redis (Optional)"
+
+== Register Flow ==
+User -> Frontend: Enter registration details
+Frontend -> Backend: POST /api/users/register\n(username, email, password)
+Backend -> Backend: Validate input (Spring Validation)
+Backend -> Backend: Hash password (BCrypt)
+Backend -> Database: Save user to PostgreSQL
+Database --> Backend: Success
+Backend --> Frontend: 201 Created
+
+== Login Flow ==
+User -> Frontend: Enter login credentials
+Frontend -> Backend: POST /api/users/login\n(username, password)
+Backend -> Database: Fetch user by username/email
+Database --> Backend: User found
+Backend -> Backend: Compare password (BCrypt)
+alt Password matches
+    Backend -> Backend: Generate accessToken (JWT)\nGenerate refreshToken (JWT)
+    Backend -> Frontend: Return accessToken\nSet refreshToken in HttpOnly cookie
+else Password does not match
+    Backend --> Frontend: 401 Unauthorized
+end
+
+== Authentication Flow ==
+User -> Frontend: Access protected resource
+Frontend -> Backend: GET /api/protected-resource\nAuthorization: Bearer <accessToken>
+Backend -> Backend: Validate accessToken (JWT)\n(Spring Security)
+alt Token valid
+    Backend -> Database: (Optional) Fetch user details
+    Database --> Backend: User details
+    Backend --> Frontend: Return resource data
+else Token invalid
+    Backend --> Frontend: 401 Unauthorized
+end
+
+== Refresh Token Flow ==
+User -> Frontend: Token expired
+Frontend -> Backend: POST /api/users/refresh-token\n(refreshToken in HttpOnly cookie)
+Backend -> Backend: Validate refreshToken (JWT)
+alt Refresh token valid
+    Backend -> Backend: Generate new accessToken (JWT)
+    Backend -> Frontend: Return new accessToken
+else Refresh token invalid
+    Backend --> Frontend: 401 Unauthorized
+end
+
+== Logout Flow ==
+User -> Frontend: Click logout
+Frontend -> Backend: POST /api/users/logout\nAuthorization: Bearer <accessToken>
+Backend -> Redis: Add accessToken to blacklist (Optional)
+Backend -> Frontend: Clear refreshToken cookie\nReturn success
+
+@enduml
+```
+## 4. Student create a book borrowing request
 
 ``` plantuml
 @startuml
