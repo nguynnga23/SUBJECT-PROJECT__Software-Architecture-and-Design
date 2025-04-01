@@ -2,12 +2,20 @@ package com.example.inventoryservice.entity;
 
 import com.example.inventoryservice.enums.Status;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "book_copy")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookCopy {
     @Id
     @GeneratedValue
@@ -21,6 +29,7 @@ public class BookCopy {
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
+    @Column(name = "copy_code", unique = true, nullable = false)
     private String copyCode;
 
     private String location;

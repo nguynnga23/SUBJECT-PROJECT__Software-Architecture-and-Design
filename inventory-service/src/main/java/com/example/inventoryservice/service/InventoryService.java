@@ -1,12 +1,15 @@
 package com.example.inventoryservice.service;
 
+import com.example.inventoryservice.dto.BookCopyRequest;
+import com.example.inventoryservice.dto.BookDTO;
 import com.example.inventoryservice.entity.Inventory;
 
 import java.util.UUID;
 
 public interface InventoryService {
-    boolean addBookToInventory(UUID bookId);
-    int updateBookQuantity(UUID bookId, Integer quantity);
+    BookDTO getBookById(UUID bookId);
+    Inventory addBookToInventory(BookCopyRequest bookCopyRequest) throws Exception;
+    Inventory updateBookQuantity(UUID bookId, String action);
     Inventory getInventory(UUID bookId);
     boolean removeBookFromInventory(UUID bookId);
 }
