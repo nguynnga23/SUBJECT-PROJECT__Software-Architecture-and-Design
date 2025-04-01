@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/user-service/users")
 @RequiredArgsConstructor
 public class UserController {
     @Autowired
@@ -36,18 +36,42 @@ public class UserController {
     private JwtService jwtService;
 
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable UUID userId,HttpServletRequest request) {
-        // Lấy userId từ token
-        String userIdFromToken = (String) request.getAttribute("userId");
+    public ResponseEntity<?> getUserById(@PathVariable UUID userId,
+                                         @RequestHeader(value = "id", required = false) String userIdFromHeader,
+                                         @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        String userIdFromToken;
 
-        if (userIdFromToken == null || !userIdFromToken.equals(userId.toString())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized access"));
+        // Trường hợp qua Gateway: lấy từ header "id"
+        if (userIdFromHeader != null) {
+            userIdFromToken = userIdFromHeader;
         }
+        // Trường hợp trực tiếp: lấy từ token trong "Authorization"
+        else if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.replace("Bearer ", "");
+            if (token.isEmpty() || !authenticationService.isTokenValid(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid or missing token"));
+            }
+            userIdFromToken = authenticationService.getUserIdFromToken(token);
+        }
+        // Không có thông tin xác thực
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Authorization header is missing"));
+        }
+
+        // Kiểm tra quyền truy cập
+        if (userIdFromToken == null || !userIdFromToken.equals(userId.toString())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Unauthorized access"));
+        }
+
         User user = userService.getUserById(userId);
         if (user != null) {
             return ResponseEntity.ok(user);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found"));
         }
     }
 
