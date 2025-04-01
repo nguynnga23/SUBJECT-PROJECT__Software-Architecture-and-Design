@@ -291,6 +291,66 @@ end
 
 @enduml
 ```
+
+## 5. AuthenticationService in User Service when not using Redis
+``` plantuml
+@startuml
+actor Client
+participant "API Gateway" as Gateway
+participant "AuthenticationService" as AuthService
+participant "JwtService" as JwtService
+participant "UserRepository" as UserRepo
+
+== Đăng nhập (authenticate) ==
+Client -> Gateway: POST /login\n(username, password)
+Gateway -> AuthService: authenticate(request, response)
+AuthService -> UserRepo: findByUsername(username)
+UserRepo --> AuthService: User
+AuthService -> JwtService: generateToken(user)
+JwtService --> AuthService: accessToken
+AuthService -> JwtService: generateRefreshToken(user)
+JwtService --> AuthService: refreshToken
+AuthService -> AuthService: Tạo HttpOnly Cookie\n(refreshToken, TTL: 7 ngày)
+AuthService --> Gateway: AuthenticationResponseDto\n(accessToken, refreshToken, email, fullName)
+Gateway --> Client: Response\n(accessToken, refreshToken, cookie)
+
+== Yêu cầu bảo mật với token ==
+Client -> Gateway: GET /api/v1/book-service/books\n(Authorization: Bearer accessToken)
+Gateway -> AuthService: isTokenValid(accessToken)
+AuthService -> JwtService: extractUsername(accessToken)
+JwtService --> AuthService: username
+AuthService -> AuthService: Kiểm tra blacklistedTokens\ncontains(accessToken)?
+alt Token trong blacklist
+    AuthService --> Gateway: InvalidBearerTokenException
+    Gateway --> Client: 401 Unauthorized
+else Token hợp lệ
+    AuthService --> Gateway: true
+    Gateway -> Gateway: Phân quyền (role, path, method)
+    Gateway --> Client: Response từ service
+end
+
+== Đăng xuất (logout) ==
+Client -> Gateway: POST /logout\n(Authorization: Bearer accessToken)
+Gateway -> AuthService: logout(accessToken)
+AuthService -> AuthService: blacklistedTokens.add(accessToken)
+AuthService --> Gateway: OK
+Gateway --> Client: Đăng xuất thành công
+
+== Làm mới token (refreshToken) ==
+Client -> Gateway: POST /refresh\n(refreshToken trong cookie)
+Gateway -> AuthService: refreshToken(refreshToken)
+AuthService -> JwtService: extractUsername(refreshToken)
+JwtService --> AuthService: username
+AuthService -> UserRepo: findByUsername(username)
+UserRepo --> AuthService: User
+AuthService -> AuthService: isTokenValid(refreshToken)
+AuthService -> JwtService: generateToken(user)
+JwtService --> AuthService: newAccessToken
+AuthService --> Gateway: RefreshTokenResponseDto\n(newAccessToken, refreshToken)
+Gateway --> Client: Response\n(newAccessToken, refreshToken)
+
+@enduml
+```
 # Borrowing Service
 ## 1. Student create a book borrowing request
 
