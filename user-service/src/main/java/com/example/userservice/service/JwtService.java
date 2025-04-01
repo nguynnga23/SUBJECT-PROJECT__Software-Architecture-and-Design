@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
+
 @Service
 public class JwtService {
 
@@ -37,22 +39,24 @@ public JwtService(
 
 }
 
-    public String generateToken(final String username) {
+    public String generateToken(final UUID userid,final String username) {
         final var claimsSet = JwtClaimsSet.builder()
                 .subject(username)
                 .issuer(issuer)
                 .expiresAt(Instant.now().plus(accessTokenTtl))
 //                .claim("role", "USER") // Thêm role vào token
+                .claim("id", userid)
                 .claim("type", "access") // Phân biệt access token
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }
-    public String generateRefreshToken(final String username) {
+    public String generateRefreshToken(final UUID userid,final String username) {
         final var claimsSet = JwtClaimsSet.builder()
                 .subject(username)
                 .issuer(issuer)
                 .expiresAt(Instant.now().plus(refreshTokenTtl))
+                .claim("id", userid)
                 .claim("type", "refresh") // Phân biệt refresh token
                 .build();
 
