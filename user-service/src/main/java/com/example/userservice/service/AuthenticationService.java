@@ -73,8 +73,8 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         // Tạo access token và refresh token
-        String accessToken = jwtService.generateToken(user.getUserId(),request.username());
-        String refreshToken = jwtService.generateRefreshToken(user.getUserId(),request.username());
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
 //        User user = userRepository.findByUsername(request.username())
 //                .orElseThrow(() -> new RuntimeException("User not found"));
@@ -119,7 +119,7 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         }
 
         // Tạo access token mới
-        String newAccessToken = jwtService.generateToken(user.getUserId(),user.getUsername());
+        String newAccessToken = jwtService.generateToken(user);
 
         // Trả về response chứa access token mới và refresh token cũ
         return new RefreshTokenResponseDto(newAccessToken, refreshToken);
