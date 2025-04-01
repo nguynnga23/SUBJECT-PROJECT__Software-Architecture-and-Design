@@ -20,6 +20,10 @@ public class GatewayConfig {
                         .filters(f -> f.filter(filter)) // Áp dụng filter cho JWT
                         .uri("lb://BOOK-SERVICE")) // Dịch vụ book-service sử dụng load balancer
 
+                .route("borrowing-service", r -> r.path("/api/v1/borrowing-service/**")
+                        .filters(f -> f.filter(filter)) // Áp dụng filter cho JWT
+                        .uri("lb://BORROWING-SERVICE")) // Dịch vụ book-service sử dụng load balancer
+
                 .route("user-service", r -> r.path("/api/v1/user-service/**")
                         .filters(f -> f.filter(filter)) // Áp dụng filter cho JWT
                         .uri("lb://USER-SERVICE")) // Dịch vụ user-service sử dụng load balancer
