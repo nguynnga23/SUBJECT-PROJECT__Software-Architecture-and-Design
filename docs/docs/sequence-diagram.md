@@ -2,6 +2,7 @@
 title: Sequence Diagram
 ---
 
+# User Service & Gateway Service
 ## 1. JWT processing process in Spring Cloud Gateway
 
 ```plantuml
@@ -245,7 +246,53 @@ Gateway --> Client: 200 OK\nUpdated user
 
 @enduml
 ```
-## 4. Student create a book borrowing request
+
+## 4. Request processing flow from client through gateway
+```plantuml
+@startuml
+actor Client
+participant "JwtAuthenticationFilter" as Filter
+participant "JwtAuthenticator" as Auth
+participant "JwtUtil" as Util
+participant "AuthorizationChecker" as Authz
+participant "ResponseHandler" as Resp
+participant "Downstream Service" as Service
+
+Client -> Filter: Gửi yêu cầu\n(path, method, Authorization header)
+Filter -> Filter: Kiểm tra path\ncó trong PUBLIC_ENDPOINTS?
+
+alt Public Endpoint
+    Filter -> Service: Chuyển tiếp yêu cầu
+    Service --> Client: Phản hồi
+else Secured Endpoint
+    Filter -> Auth: authenticate(request)
+    Auth -> Util: validateToken(token)
+    alt Token không hợp lệ
+        Util --> Auth: Ném JwtTokenMalformedException\nhoặc JwtTokenMissingException
+        Auth --> Filter: Truyền ngoại lệ
+        Filter -> Resp: badRequestResponse(exchange)
+        Resp --> Client: 400 Bad Request
+    else Token hợp lệ
+        Util --> Auth: Trả về Claims
+        Auth --> Filter: Trả về Claims\n(id, role)
+        Filter -> Authz: checkAuthorization(path, method, role)
+        alt Không đủ quyền
+            Authz --> Filter: Ném SecurityException\n(vd: "Chỉ Admin...")
+            Filter -> Resp: forbiddenResponse(exchange, message)
+            Resp --> Client: 403 Forbidden
+        else Đủ quyền
+            Authz --> Filter: Không ném ngoại lệ
+            Filter -> Filter: Thêm headers\n(X-User-Id, X-User-Role)
+            Filter -> Service: Chuyển tiếp yêu cầu
+            Service --> Client: Phản hồi
+        end
+    end
+end
+
+@enduml
+```
+# Borrowing Service
+## 1. Student create a book borrowing request
 
 ``` plantuml
 @startuml
