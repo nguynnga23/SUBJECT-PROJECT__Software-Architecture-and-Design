@@ -1,7 +1,9 @@
 package com.example.userservice.service;
 
+import com.example.userservice.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -39,25 +41,26 @@ public JwtService(
 
 }
 
-    public String generateToken(final UUID userid,final String username) {
+    public String generateToken(User user) {
         final var claimsSet = JwtClaimsSet.builder()
-                .subject(username)
+                .subject(user.getUsername())
                 .issuer(issuer)
                 .expiresAt(Instant.now().plus(accessTokenTtl))
-//                .claim("role", "USER") // Thêm role vào token
-                .claim("id", userid)
+                .claim("role", user.getRole()) // Thêm role vào token
+                .claim("id", user.getUserId())
                 .claim("type", "access") // Phân biệt access token
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
     }
-    public String generateRefreshToken(final UUID userid,final String username) {
+    public String generateRefreshToken(User user) {
         final var claimsSet = JwtClaimsSet.builder()
-                .subject(username)
+                .subject(user.getUsername())
                 .issuer(issuer)
-                .expiresAt(Instant.now().plus(refreshTokenTtl))
-                .claim("id", userid)
-                .claim("type", "refresh") // Phân biệt refresh token
+                .expiresAt(Instant.now().plus(accessTokenTtl))
+                .claim("role", user.getRole()) // Thêm role vào token
+                .claim("id", user.getUserId())
+                .claim("type", "refresh") // Phân biệt access token
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
