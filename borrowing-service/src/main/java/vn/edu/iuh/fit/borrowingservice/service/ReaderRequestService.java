@@ -2,16 +2,14 @@ package vn.edu.iuh.fit.borrowingservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.util.EnumUtils;
-import vn.edu.iuh.fit.borrowingservice.DTO.ReaderRequestDTO;
-import vn.edu.iuh.fit.borrowingservice.DTO.UpdateStatusDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.UpdateStatusDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequestDetail;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;

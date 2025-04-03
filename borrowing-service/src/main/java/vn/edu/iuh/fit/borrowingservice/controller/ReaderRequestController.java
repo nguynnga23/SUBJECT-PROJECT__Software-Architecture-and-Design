@@ -3,9 +3,9 @@ package vn.edu.iuh.fit.borrowingservice.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vn.edu.iuh.fit.borrowingservice.DTO.PenaltyDTO;
-import vn.edu.iuh.fit.borrowingservice.DTO.ReaderRequestDTO;
-import vn.edu.iuh.fit.borrowingservice.DTO.UpdateStatusDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.PenaltyDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.UpdateStatusDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.service.ReaderRequestService;
 
