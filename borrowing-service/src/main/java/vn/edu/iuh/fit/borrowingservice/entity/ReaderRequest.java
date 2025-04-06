@@ -58,7 +58,4 @@ public class ReaderRequest {
 
     @OneToMany(mappedBy = "readerRequest", cascade = CascadeType.ALL)
     private List<ReaderRequestDetail> borrowRequestDetails;
-
-
-
 }
