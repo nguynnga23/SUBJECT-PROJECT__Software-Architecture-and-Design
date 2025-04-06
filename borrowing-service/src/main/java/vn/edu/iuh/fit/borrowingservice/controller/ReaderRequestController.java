@@ -7,21 +7,31 @@ import vn.edu.iuh.fit.borrowingservice.dto.PenaltyDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.UpdateStatusDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
+import vn.edu.iuh.fit.borrowingservice.mapper.ReaderRequestMapper;
 import vn.edu.iuh.fit.borrowingservice.service.ReaderRequestService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/borrow-requests")
+@RequestMapping("/api/v1/borrowing-service/borrow-requests")
 public class ReaderRequestController {
     @Autowired
     private ReaderRequestService readerRequestService;
-
+    private ReaderRequestMapper mapper = new ReaderRequestMapper();
     @PostMapping
-    public ResponseEntity<ReaderRequest> createRequest(@RequestBody ReaderRequestDTO requestDTO) {
-        return ResponseEntity.ok(readerRequestService.createBorrowRequest(requestDTO));
+    public ResponseEntity<ReaderRequestDTO> createRequest(@RequestBody ReaderRequestDTO requestDTO) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.createBorrowRequest(requestDTO);
+
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
     }
+
+
 
     @PutMapping("/{requestId}/status")
     public ResponseEntity<ReaderRequest> updateStatus(@PathVariable UUID requestId, @RequestBody UpdateStatusDTO statusDTO) {
