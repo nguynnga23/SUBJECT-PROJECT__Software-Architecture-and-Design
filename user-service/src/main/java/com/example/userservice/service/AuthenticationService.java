@@ -18,9 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -71,13 +69,15 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
     try {
         final var authToken = UsernamePasswordAuthenticationToken.unauthenticated(request.username(), request.passwordHash());
         authenticationManager.authenticate(authToken);
-
-        // Tạo access token và refresh token
-        String accessToken = jwtService.generateToken(request.username());
-        String refreshToken = jwtService.generateRefreshToken(request.username());
-
+//        UUID id
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        // Tạo access token và refresh token
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+//        User user = userRepository.findByUsername(request.username())
+//                .orElseThrow(() -> new RuntimeException("User not found"));
         // Lưu Refresh Token vào HttpOnly Cookie
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
@@ -119,7 +119,7 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         }
 
         // Tạo access token mới
-        String newAccessToken = jwtService.generateToken(user.getUsername());
+        String newAccessToken = jwtService.generateToken(user);
 
         // Trả về response chứa access token mới và refresh token cũ
         return new RefreshTokenResponseDto(newAccessToken, refreshToken);
