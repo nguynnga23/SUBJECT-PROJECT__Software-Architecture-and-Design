@@ -1,4 +1,4 @@
-package vn.edu.iuh.fit.borrowingservice.Exceptions;
+package vn.edu.iuh.fit.borrowingservice.exceptions;
 
 
 import jakarta.persistence.EntityNotFoundException;
