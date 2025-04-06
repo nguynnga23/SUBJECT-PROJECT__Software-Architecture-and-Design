@@ -10,6 +10,7 @@ import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.mapper.ReaderRequestMapper;
 import vn.edu.iuh.fit.borrowingservice.service.ReaderRequestService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,22 +47,49 @@ public class ReaderRequestController {
     }
 
     @PutMapping("/{requestId}/borrow")
-    public ResponseEntity<ReaderRequest> updateBorrowDate(@PathVariable UUID requestId) {
-        return ResponseEntity.ok(readerRequestService.updateBorrowDate(requestId));
+    public ResponseEntity<ReaderRequestDTO> updateBorrowDate(@PathVariable UUID requestId) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.updateBorrowDate(requestId);
+
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping("/{requestId}/return")
-    public ResponseEntity<ReaderRequest> updateReturnDate(@PathVariable UUID requestId) {
-        return ResponseEntity.ok(readerRequestService.updateReturnDate(requestId));
+    public ResponseEntity<ReaderRequestDTO> updateReturnDate(@PathVariable UUID requestId) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.updateReturnDate(requestId);
+
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping("/{requestId}/penalty")
-    public ResponseEntity<ReaderRequest> updatePenalty(@PathVariable UUID requestId, @RequestBody PenaltyDTO penaltyDTO) {
-        return ResponseEntity.ok(readerRequestService.updatePenalty(requestId, penaltyDTO.getPenaltyFee()));
+    public ResponseEntity<ReaderRequestDTO> updatePenalty(@PathVariable UUID requestId, @RequestBody PenaltyDTO penaltyDTO) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.updatePenalty(requestId, penaltyDTO.getPenaltyFee());
+
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/users/{userId}/borrow-history")
-    public ResponseEntity<List<ReaderRequest>> getBorrowHistory(@PathVariable UUID userId) {
-        return ResponseEntity.ok(readerRequestService.getBorrowHistory(userId));
+    @GetMapping("/users/borrow-history")
+    public ResponseEntity<List<ReaderRequestDTO>> getBorrowHistory() {
+        List<ReaderRequest> borrowHistory = readerRequestService.getBorrowHistory();
+        List<ReaderRequestDTO> readerRequestDTOs = new ArrayList<>();
+        for(ReaderRequest readerRequest : borrowHistory) {
+            ReaderRequestDTO readerRequestDTO = mapper.mapToDTO(readerRequest);
+            readerRequestDTOs.add(readerRequestDTO);
+        }
+        return ResponseEntity.ok(readerRequestDTOs);
     }
 }

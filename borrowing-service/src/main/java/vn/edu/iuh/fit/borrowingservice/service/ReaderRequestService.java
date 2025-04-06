@@ -134,7 +134,11 @@ public class ReaderRequestService {
         }
     }
 
-    public List<ReaderRequest> getBorrowHistory(UUID readerId) {
-        return readerRequestRepository.findByReaderId(readerId);
+    public List<ReaderRequest> getBorrowHistory() {
+        String readerId = request.getHeader("X-User-Id");
+        if (readerId == null || readerId.isEmpty()) {
+            throw new IllegalArgumentException("Missing Reader ID in request header.");
+        }
+        return readerRequestRepository.findByReaderId(UUID.fromString(readerId));
     }
 }
