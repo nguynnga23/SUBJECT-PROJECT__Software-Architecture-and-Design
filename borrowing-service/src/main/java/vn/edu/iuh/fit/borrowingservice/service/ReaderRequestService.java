@@ -72,16 +72,25 @@ public class ReaderRequestService {
     }
 
     public ReaderRequest updateStatus(UUID requestId, UpdateStatusDTO statusDTO) {
-        if(!readerRequestRepository.findById(requestId).isPresent()){
-            throw  new IllegalArgumentException("Not found requestId");
-
+        String librarianId = request.getHeader("X-User-Id");
+        if (librarianId == null || librarianId.isEmpty()) {
+            throw new IllegalArgumentException("Missing Reader ID in request header.");
         }
+
+        String roles = request.getHeader("X-User-Role");
+        if (roles == null || !roles.contains("ADMIN")) {
+            throw new IllegalArgumentException("Only admins can update request status.");
+        }
+
+        ReaderRequest request = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
+
         if (!EnumSet.allOf(BorrowStatus.class).contains(statusDTO.getStatus())) {
             throw new IllegalArgumentException("Invalid status: " + statusDTO.getStatus());
         }
-        ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
+
         request.setStatus(statusDTO.getStatus());
-        request.setLibrarianId(statusDTO.getLibrarianId());
+        request.setLibrarianId(UUID.fromString(librarianId));
         request.setUpdatedAt(LocalDateTime.now());
         return readerRequestRepository.save(request);
     }
