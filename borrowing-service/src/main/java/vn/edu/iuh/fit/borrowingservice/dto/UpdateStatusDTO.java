@@ -1,4 +1,4 @@
-package vn.edu.iuh.fit.borrowingservice.DTO;
+package vn.edu.iuh.fit.borrowingservice.dto;
 
 import lombok.Data;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
