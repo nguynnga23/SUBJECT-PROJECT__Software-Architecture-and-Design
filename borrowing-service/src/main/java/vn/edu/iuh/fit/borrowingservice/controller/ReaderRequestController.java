@@ -34,8 +34,15 @@ public class ReaderRequestController {
 
 
     @PutMapping("/{requestId}/status")
-    public ResponseEntity<ReaderRequest> updateStatus(@PathVariable UUID requestId, @RequestBody UpdateStatusDTO statusDTO) {
-        return ResponseEntity.ok(readerRequestService.updateStatus(requestId, statusDTO));
+    public ResponseEntity<ReaderRequestDTO> updateStatus(@PathVariable UUID requestId, @RequestBody UpdateStatusDTO statusDTO) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.updateStatus(requestId, statusDTO);
+
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping("/{requestId}/borrow")
