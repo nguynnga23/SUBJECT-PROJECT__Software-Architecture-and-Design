@@ -1,5 +1,6 @@
 package com.example.inventoryservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,5 +37,6 @@ public class Inventory {
     private int damaged;
 
     @OneToMany(mappedBy = "inventory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Set<BookCopy> bookCopies;
 }
