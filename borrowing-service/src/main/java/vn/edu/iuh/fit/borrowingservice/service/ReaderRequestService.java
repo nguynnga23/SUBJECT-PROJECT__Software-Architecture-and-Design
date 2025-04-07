@@ -1,17 +1,19 @@
 package vn.edu.iuh.fit.borrowingservice.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.util.EnumUtils;
-import vn.edu.iuh.fit.borrowingservice.DTO.ReaderRequestDTO;
-import vn.edu.iuh.fit.borrowingservice.DTO.UpdateStatusDTO;
+import vn.edu.iuh.fit.borrowingservice.annotation.RequireAdmin;
+import vn.edu.iuh.fit.borrowingservice.clients.UserServiceClient;
+import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.UpdateStatusDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.UserDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequestDetail;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -19,115 +21,124 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReaderRequestService {
+
     @Autowired
     private ReaderRequestRepository readerRequestRepository;
 
+    @Autowired
+    private UserServiceClient userServiceClient;
+
+    @Autowired
+    private HttpServletRequest request;
+
     public ReaderRequest createBorrowRequest(ReaderRequestDTO requestDTO) {
-        if (requestDTO.getReaderId() == null || requestDTO.getBookCopyIds() == null || requestDTO.getBookCopyIds().isEmpty()) {
-            throw new IllegalArgumentException("Reader ID and The list of books must not be left blank.");
+        // Lấy readerId từ HTTP Header do API Gateway truyền xuống
+        String readerId = request.getHeader("X-User-Id");
+        if (readerId == null || readerId.isEmpty()) {
+            throw new IllegalArgumentException("Missing Reader ID in request header.");
         }
-        if( requestDTO.getBorrowingPeriod() == null  || requestDTO.getBorrowingPeriod()<=0 )
-        {
+
+        // Kiểm tra thông tin mượn
+        if (requestDTO.getBorrowRequestDetails() == null || requestDTO.getBorrowRequestDetails().isEmpty()) {
+            throw new IllegalArgumentException("The list of books must not be left blank.");
+        }
+        if (requestDTO.getBorrowingPeriod() == null || requestDTO.getBorrowingPeriod() <= 0) {
             throw new IllegalArgumentException("The borrowing period must be greater than 0 and not left blank.");
         }
 
-       try {
-           ReaderRequest request = new ReaderRequest();
-           request.setReaderId(requestDTO.getReaderId());
-           request.setStatus(BorrowStatus.PENDING);
-           request.setBorrowingPeriod(requestDTO.getBorrowingPeriod());
-           request.setCreatedAt(LocalDateTime.now());
-           request.setUpdatedAt(LocalDateTime.now());
-//           Tiính ngày dự kiến trả return_date dựa vào period
-            int period = requestDTO.getBorrowingPeriod();
-            LocalDateTime return_date = LocalDateTime.now().plusDays(period);
-            request.setReturnDate(return_date);
+        try {
+            // Tạo ReaderRequest từ DTO
+            ReaderRequest readerRequest = new ReaderRequest();
+            readerRequest.setReaderId(UUID.fromString(readerId));
+            readerRequest.setStatus(BorrowStatus.PENDING);
+            readerRequest.setBorrowingPeriod(requestDTO.getBorrowingPeriod());
+            readerRequest.setCreatedAt(LocalDateTime.now());
+            readerRequest.setUpdatedAt(LocalDateTime.now());
 
-           // Tạo danh sách ReaderRequestDetail từ danh sách bookCopyIds
-           List<ReaderRequestDetail> requestDetails = requestDTO.getBookCopyIds().stream().map(bookCopyId -> {
-               ReaderRequestDetail detail = new ReaderRequestDetail();
-               detail.setReaderRequest(request);
-               detail.setBookCopyId(bookCopyId);
-               return detail;
-           }).collect(Collectors.toList());
+            // Tính toán ngày trả sách
+            LocalDateTime returnDate = LocalDateTime.now().plusDays(requestDTO.getBorrowingPeriod());
+            readerRequest.setReturnDate(returnDate);
 
-           // Gán danh sách vào request
-           request.setBorrowRequestDetails(requestDetails);
-           return readerRequestRepository.save(request);
-       } catch (RuntimeException e) {
+            // Map borrowRequestDetails từ DTO sang Entity
+            List<ReaderRequestDetail> requestDetails = requestDTO.getBorrowRequestDetails().stream()
+                    .map(detailDTO -> {
+                        ReaderRequestDetail detail = new ReaderRequestDetail();
+                        detail.setReaderRequest(readerRequest);
+                        detail.setBookCopyId(detailDTO.getBookCopyId());
+                        return detail;
+                    }).collect(Collectors.toList());
 
-           throw new RuntimeException("Lỗi khi tạo yêu cầu mượn sách: " + e.getMessage());
-       }
+            readerRequest.setBorrowRequestDetails(requestDetails);
+
+            // Lưu yêu cầu mượn vào cơ sở dữ liệu
+            return readerRequestRepository.save(readerRequest);
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Error creating borrow request: " + e.getMessage());
+        }
     }
 
+    @RequireAdmin
     public ReaderRequest updateStatus(UUID requestId, UpdateStatusDTO statusDTO) {
-        if(!readerRequestRepository.findById(requestId).isPresent()){
-            throw  new IllegalArgumentException("Not found requestId");
+        ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
 
-        }
         if (!EnumSet.allOf(BorrowStatus.class).contains(statusDTO.getStatus())) {
             throw new IllegalArgumentException("Invalid status: " + statusDTO.getStatus());
         }
-        ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
-        request.setStatus(statusDTO.getStatus());
-        request.setLibrarianId(statusDTO.getLibrarianId());
-        request.setUpdatedAt(LocalDateTime.now());
-        return readerRequestRepository.save(request);
+
+        readerRequest.setStatus(statusDTO.getStatus());
+        readerRequest.setLibrarianId(UUID.fromString(request.getHeader("X-User-Id")));
+        readerRequest.setUpdatedAt(LocalDateTime.now());
+        return readerRequestRepository.save(readerRequest);
     }
 
+    @RequireAdmin
     public ReaderRequest updateBorrowDate(UUID requestId) {
-        if(!readerRequestRepository.findById(requestId).isPresent()){
-            throw  new IllegalArgumentException("Not found requestId");
+        ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
 
-        }
-        ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
-        request.setDateBorrowed(LocalDateTime.now());
-        request.setStatus(BorrowStatus.BORROWED);
-        request.setUpdatedAt(LocalDateTime.now());
-        return readerRequestRepository.save(request);
+        readerRequest.setDateBorrowed(LocalDateTime.now());
+        readerRequest.setStatus(BorrowStatus.BORROWED);
+        readerRequest.setUpdatedAt(LocalDateTime.now());
+        return readerRequestRepository.save(readerRequest);
     }
 
+    @RequireAdmin
     public ReaderRequest updateReturnDate(UUID requestId) {
-        if(!readerRequestRepository.findById(requestId).isPresent()){
-            throw  new IllegalArgumentException("Not found requestId");
+        ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
 
+        if (readerRequest.getReturnDate().isBefore(LocalDateTime.now())) {
+            readerRequest.setDateReturned(LocalDateTime.now());
+            readerRequest.setStatus(BorrowStatus.OVERDUE);
+            readerRequest.setUpdatedAt(LocalDateTime.now());
+            return readerRequestRepository.save(readerRequest);
         }
-        ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
-        if(request.getReturnDate().isBefore(LocalDateTime.now())){
-//            throw new IllegalArgumentException("Overdue payment date, pay the fee");
-            request.setDateReturned(LocalDateTime.now());
-            request.setStatus(BorrowStatus.OVERDUE);
-            request.setUpdatedAt(LocalDateTime.now());
-            return readerRequestRepository.save(request);
-        }
-        request.setDateReturned(LocalDateTime.now());
-        request.setStatus(BorrowStatus.RETURNED);
-        request.setUpdatedAt(LocalDateTime.now());
-        return readerRequestRepository.save(request);
+        readerRequest.setDateReturned(LocalDateTime.now());
+        readerRequest.setStatus(BorrowStatus.RETURNED);
+        readerRequest.setUpdatedAt(LocalDateTime.now());
+        return readerRequestRepository.save(readerRequest);
     }
 
+    @RequireAdmin
     public ReaderRequest updatePenalty(UUID requestId, Double penaltyFee) {
-        if(!readerRequestRepository.findById(requestId).isPresent()){
-            throw  new IllegalArgumentException("Not found requestId");
+        ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
 
-        }
-
-        ReaderRequest request = readerRequestRepository.findById(requestId).orElseThrow();
-        if(request.getStatus().equals(BorrowStatus.OVERDUE))
-        {
-//           count days return late
-//            long overdueDays = ChronoUnit.DAYS.between(request.getReturnDate(), LocalDateTime.now());
-//            penaltyFee = overdueDays*50000.0;
-            request.setPenaltyFee(penaltyFee);
-            return readerRequestRepository.save(request);
-        }
-        else{
+        if (readerRequest.getStatus().equals(BorrowStatus.OVERDUE)) {
+            readerRequest.setPenaltyFee(penaltyFee);
+            return readerRequestRepository.save(readerRequest);
+        } else {
             throw new IllegalArgumentException("Not found request have status OVERDUE");
         }
-
     }
 
-    public List<ReaderRequest> getBorrowHistory(UUID readerId) {
-        return readerRequestRepository.findByReaderId(readerId);
+    public List<ReaderRequest> getBorrowHistory() {
+        String readerId = request.getHeader("X-User-Id");
+        if (readerId == null || readerId.isEmpty()) {
+            throw new IllegalArgumentException("Missing Reader ID in request header.");
+        }
+        return readerRequestRepository.findByReaderId(UUID.fromString(readerId));
     }
 }
