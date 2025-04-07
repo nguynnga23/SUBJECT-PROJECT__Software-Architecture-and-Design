@@ -1,6 +1,7 @@
 package com.example.inventoryservice.entity;
 
 import com.example.inventoryservice.enums.Status;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class BookCopy {
 
     @ManyToOne
     @JoinColumn(name = "inventory_id")
+    @JsonBackReference
     private Inventory inventory;
 
     @Column(name = "copy_code", unique = true, nullable = false)
