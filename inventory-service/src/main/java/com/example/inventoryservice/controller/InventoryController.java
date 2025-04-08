@@ -6,14 +6,13 @@ import com.example.inventoryservice.entity.Inventory;
 import com.example.inventoryservice.service.BookCopyService;
 import com.example.inventoryservice.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.awt.print.Book;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/inventory-service")
@@ -55,10 +54,12 @@ public class InventoryController {
                 Inventory inventory = inventoryService.getInventoryByBookId(bookCopy.getBookId());
                 if(inventory != null){
                     inventory.setAvailable(inventory.getAvailable() + 1);
+                    inventory.setTotalQuantity(inventory.getTotalQuantity() + 1);
                     bookCopy.setInventory(inventoryService.saveInventory(inventory));
                 }else {
                     Inventory newInventory = new Inventory();
                     newInventory.setAvailable(1);
+                    newInventory.setTotalQuantity(1);
                     newInventory.setLost(0);
                     newInventory.setDamaged(0);
                     newInventory.setBorrowed(0);
@@ -74,6 +75,37 @@ public class InventoryController {
 //        } catch (Exception e) {
 //            return ResponseEntity.status(500).body(Map.of("error","Cannot check book's information"));
 //        }
+    }
+
+    @GetMapping("/{bookId}")
+    public ResponseEntity<?> getBookCopy(@PathVariable UUID bookId) {
+        Inventory inventory = inventoryService.getInventoryByBookId(bookId);
+        if(inventory != null){
+            return ResponseEntity.ok(inventory);
+        }
+        return ResponseEntity.status(400).body(Map.of("error","Book does not exist"));
+    }
+
+    @DeleteMapping("/remove/{bookId}")
+    public ResponseEntity<?> deleteBook(@PathVariable UUID bookId){
+        boolean isDeleted = inventoryService.deleteInventory(bookId);
+
+        if(isDeleted){
+            return ResponseEntity.ok(Map.of("message", "Inventory deleted successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "BookId not found"));
+        }
+    }
+
+    @PutMapping("/update/{bookId}")
+    public ResponseEntity<?> updateInventory(@PathVariable UUID bookId, @RequestBody Inventory newInventory){
+        Inventory inventory = inventoryService.getInventoryByBookId(bookId);
+        if(inventory != null){
+            inventoryService.updateInventory(bookId, newInventory);
+            return ResponseEntity.ok(inventory);
+        }
+        return ResponseEntity.ok(Map.of("error", "Inventory not found for bookId"));
     }
 
 }

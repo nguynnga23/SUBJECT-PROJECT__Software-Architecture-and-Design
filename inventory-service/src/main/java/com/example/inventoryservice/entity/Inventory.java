@@ -26,15 +26,15 @@ public class Inventory {
     private UUID bookId;
 
     @Column(name = "total_quantity")
-    private int totalQuantity;
+    private Integer totalQuantity;
 
-    private int available;
+    private Integer available;
 
-    private int borrowed;
+    private Integer borrowed;
 
-    private int lost;
+    private Integer lost;
 
-    private int damaged;
+    private Integer damaged;
 
     @OneToMany(mappedBy = "inventory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
