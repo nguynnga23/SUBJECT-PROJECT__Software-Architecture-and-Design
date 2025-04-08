@@ -3,6 +3,7 @@ package com.example.inventoryservice.controller;
 import com.example.inventoryservice.dto.BookDTO;
 import com.example.inventoryservice.entity.BookCopy;
 import com.example.inventoryservice.entity.Inventory;
+import com.example.inventoryservice.enums.Status;
 import com.example.inventoryservice.service.BookCopyService;
 import com.example.inventoryservice.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +53,23 @@ public class InventoryController {
                 bookCopy.setCopyCode(formattedCode);
 
                 Inventory inventory = inventoryService.getInventoryByBookId(bookCopy.getBookId());
+
                 if(inventory != null){
-                    inventory.setAvailable(inventory.getAvailable() + 1);
+                    Status status = bookCopy.getStatus();
+                    switch (status) {
+                        case BORROWED:
+                            inventory.setBorrowed(inventory.getBorrowed() + 1);
+                            break;
+                        case AVAILABLE: // Tra sach
+                            inventory.setAvailable(inventory.getAvailable() + 1);
+                            break;
+                        case LOST:
+                            inventory.setLost(inventory.getLost() + 1);
+                            break;
+                        case DAMAGED:
+                            inventory.setDamaged(inventory.getDamaged() + 1);
+                            break;
+                    }
                     inventory.setTotalQuantity(inventory.getTotalQuantity() + 1);
                     bookCopy.setInventory(inventoryService.saveInventory(inventory));
                 }else {
@@ -66,7 +82,7 @@ public class InventoryController {
                     newInventory.setBookId(bookCopy.getBookId());
                     bookCopy.setInventory(inventoryService.saveInventory(newInventory));
                 }
-                System.out.println(bookCopy);
+
                 bookCopyService.addBookCopy(bookCopy);
                 return ResponseEntity.ok(bookCopy);
 //            } else {
@@ -103,6 +119,15 @@ public class InventoryController {
         Inventory inventory = inventoryService.getInventoryByBookId(bookId);
         if(inventory != null){
             inventoryService.updateInventory(bookId, newInventory);
+            return ResponseEntity.ok(inventory);
+        }
+        return ResponseEntity.ok(Map.of("error", "Inventory not found for bookId"));
+    }
+    @PutMapping("/update-action/{action}/{bookId}")
+    public ResponseEntity<?> updateActionInventory(@PathVariable Status action, @PathVariable UUID bookId){
+        Inventory inventory = inventoryService.getInventoryByBookId(bookId);
+        if(inventory != null){
+            inventoryService.updateActionInventory(bookId, action);
             return ResponseEntity.ok(inventory);
         }
         return ResponseEntity.ok(Map.of("error", "Inventory not found for bookId"));

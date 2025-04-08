@@ -1,5 +1,6 @@
 package com.example.inventoryservice.service.impl;
 import com.example.inventoryservice.entity.Inventory;
+import com.example.inventoryservice.enums.Status;
 import com.example.inventoryservice.repositories.InventoryRepository;
 import com.example.inventoryservice.service.InventoryService;
 import jakarta.persistence.EntityNotFoundException;
@@ -52,6 +53,30 @@ public class InventoryServiceImpl implements InventoryService{
         }
         if (newInventory.getTotalQuantity() != null) {
             inventory.setTotalQuantity(newInventory.getTotalQuantity());
+        }
+        return inventoryRepository.save(inventory);
+    }
+
+    @Override
+    public Inventory updateActionInventory(UUID bookId, Status status) {
+        Inventory inventory = inventoryRepository.getInventoryByBookId(bookId);
+        switch (status){
+            case BORROWED:
+                inventory.setAvailable(inventory.getAvailable() - 1);
+                inventory.setBorrowed(inventory.getBorrowed() + 1);
+                break;
+            case AVAILABLE: // Tra sach
+                inventory.setAvailable(inventory.getAvailable() + 1);
+                inventory.setBorrowed(inventory.getBorrowed() - 1);
+                break;
+            case LOST:
+                inventory.setLost(inventory.getLost() + 1);
+                inventory.setBorrowed(inventory.getBorrowed() - 1);
+                break;
+            case DAMAGED:
+                inventory.setDamaged(inventory.getDamaged() + 1);
+                inventory.setBorrowed(inventory.getBorrowed() - 1);
+                break;
         }
         return inventoryRepository.save(inventory);
     }
