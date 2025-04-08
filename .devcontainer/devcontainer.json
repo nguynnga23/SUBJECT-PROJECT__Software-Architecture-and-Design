@@ -1,0 +1,21 @@
+{
+    "name": "Java 17 Spring Boot Dev",
+    "image": "mcr.microsoft.com/devcontainers/java:17",
+    "features": {
+      "gradle": "latest"
+    },
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "java.configuration.runtimes": [
+            {
+              "name": "JavaSE-17",
+              "path": "/usr/lib/jvm/java-17-openjdk"
+            }
+          ]
+        }
+      }
+    },
+    "postCreateCommand": "./gradlew clean build"
+  }
+  
