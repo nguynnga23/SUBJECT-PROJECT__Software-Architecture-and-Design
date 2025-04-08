@@ -1,21 +1,21 @@
 {
-    "name": "Java 17 Spring Boot Dev",
-    "image": "mcr.microsoft.com/devcontainers/java:17",
-    "features": {
-      "gradle": "latest"
-    },
-    "customizations": {
-      "vscode": {
-        "settings": {
-          "java.configuration.runtimes": [
-            {
-              "name": "JavaSE-17",
-              "path": "/usr/lib/jvm/java-17-openjdk"
-            }
-          ]
-        }
+  "name": "Java 21 Spring Boot Dev",
+  "image": "mcr.microsoft.com/devcontainers/java:21",
+  "features": {
+    "gradle": "latest"
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-21",
+            "path": "/usr/lib/jvm/java-21-openjdk",
+            "default": true
+          }
+        ]
       }
-    },
-    "postCreateCommand": "./gradlew clean build"
-  }
-  
+    }
+  },
+  "postCreateCommand": "echo '✅ Java 21 Ready'; java -version"
+}
