@@ -12,7 +12,6 @@ import java.util.List;
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
-
     private final NotificationRepository notificationRepository;
 
     @GetMapping("/{userId}")
