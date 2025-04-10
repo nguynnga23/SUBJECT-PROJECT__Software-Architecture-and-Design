@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Document(collection = "notifications")
 @Data
@@ -20,7 +21,7 @@ public class Notification {
     @Id
     private String id;
 
-    private String userId;
+    private UUID userId;
     private String title;
     private String message;
 
