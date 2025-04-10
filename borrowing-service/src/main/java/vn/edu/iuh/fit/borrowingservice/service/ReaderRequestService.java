@@ -2,6 +2,8 @@ package vn.edu.iuh.fit.borrowingservice.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.fit.borrowingservice.annotation.RequireAdmin;
 import vn.edu.iuh.fit.borrowingservice.clients.UserServiceClient;
@@ -11,6 +13,7 @@ import vn.edu.iuh.fit.borrowingservice.dto.UserDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequestDetail;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
+import vn.edu.iuh.fit.borrowingservice.kafka.KafkaBorrowingProducer;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
@@ -21,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReaderRequestService {
-
     @Autowired
     private ReaderRequestRepository readerRequestRepository;
 
@@ -30,6 +32,10 @@ public class ReaderRequestService {
 
     @Autowired
     private HttpServletRequest request;
+
+
+    @Autowired
+    private KafkaBorrowingProducer producer;
 
     public ReaderRequest createBorrowRequest(ReaderRequestDTO requestDTO) {
         // Lấy readerId từ HTTP Header do API Gateway truyền xuống
@@ -71,8 +77,13 @@ public class ReaderRequestService {
             readerRequest.setBorrowRequestDetails(requestDetails);
 
             // Lưu yêu cầu mượn vào cơ sở dữ liệu
-            return readerRequestRepository.save(readerRequest);
+            ReaderRequest savedRequest = readerRequestRepository.save(readerRequest);
 
+            // Gửi thông báo sau khi tạo yêu cầu mượn thành công
+            String notificationMessage = "Borrow request created successfully for readerId: " + readerId;
+            producer.sendBorrowingEvent(notificationMessage);
+
+            return savedRequest;
         } catch (RuntimeException e) {
             throw new RuntimeException("Error creating borrow request: " + e.getMessage());
         }
