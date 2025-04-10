@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
@@ -20,12 +21,12 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Notification notification = new Notification();
-        notification.setUserId("12345");
-        notification.setMessage("Sách bạn mượn sắp đến hạn trả!");
-        notification.setType(NotificationType.DUE_DATE_REMINDER);
-        notification.setRead(false);
-        notification.setCreatedAt(Date.from(Instant.now()));
-        notificationRepository.save(notification);
+//        Notification notification = new Notification();
+//        notification.setUserId(UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+//        notification.setMessage("Sách bạn mượn sắp đến hạn trả!");
+//        notification.setType(NotificationType.DUE_DATE_REMINDER);
+//        notification.setRead(false);
+//        notification.setCreatedAt(Date.from(Instant.now()));
+//        notificationRepository.save(notification);
     }
 }
