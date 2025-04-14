@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaBorrowingConsumer {
     @KafkaListener(
-            topics = "${app.kafka.topic.borrowing}",
+            topics = "${spring.kafka.topic.borrowing}",
             groupId = "${spring.kafka.consumer.group-id}"
     )
     public void consumeMessage(String message) {

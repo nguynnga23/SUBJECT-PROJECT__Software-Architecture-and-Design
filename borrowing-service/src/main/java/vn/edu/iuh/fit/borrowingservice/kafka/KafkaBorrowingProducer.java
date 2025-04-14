@@ -12,7 +12,7 @@ public class KafkaBorrowingProducer {
 
     public KafkaBorrowingProducer(
             KafkaTemplate<String, String> kafkaTemplate,
-            @Value("${app.kafka.topic.borrowing}") String topic) {
+            @Value("${spring.kafka.topic.borrowing}") String topic) {
         this.kafkaTemplate = kafkaTemplate;
         this.topic = topic;
     }
