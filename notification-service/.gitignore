@@ -37,5 +37,6 @@ out/
 .vscode/
 
 .env
-# Ignore real config file
-application.properties
+# Bỏ qua file cấu hình ứng dụng thật
+/src/main/resources/application.properties
+
