@@ -7,6 +7,7 @@ import com.example.inventoryservice.entity.Inventory;
 import com.example.inventoryservice.enums.Status;
 import com.example.inventoryservice.service.BookCopyService;
 import com.example.inventoryservice.service.InventoryService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +76,27 @@ public class InventoryController {
                     .body(Map.of("error", "Failed to retrieve inventories"));
         }
     }
+
+    @GetMapping("/check-available/{bookId}")
+    public ResponseEntity<?> checkAvailable(@PathVariable UUID bookId) {
+        try {
+            Inventory inventory = inventoryService.getInventoryByBookId(bookId);
+            if (inventory == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Inventory not found for bookId: " + bookId));
+            }
+
+            int available = inventory.getAvailable();
+            return ResponseEntity.ok(Map.of(
+                    "available", available > 0,
+                    "quantity", available
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to check availability"));
+        }
+    }
+
 
 //    @GetMapping("/inventory/{id}")
 //    public ResponseEntity<?> getInventoryById(@PathVariable UUID id) {

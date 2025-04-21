@@ -21,13 +21,12 @@ public class ReaderRequestMapper {
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setBorrowingPeriod(entity.getBorrowingPeriod());
-        // ❌ đừng map borrowRequestDetails nếu không cần
         // Map borrowRequestDetails nếu cần
         if (entity.getBorrowRequestDetails() != null) {
             List<ReaderRequestDetailDTO> detailDTOs = entity.getBorrowRequestDetails().stream()
                     .map(detail -> {
                         ReaderRequestDetailDTO detailDTO = new ReaderRequestDetailDTO();
-                        detailDTO.setBookCopyId(detail.getBookCopyId());
+                        detailDTO.setBookId(detail.getBookCopyId());
                         return detailDTO;
                     })
                     .collect(Collectors.toList());

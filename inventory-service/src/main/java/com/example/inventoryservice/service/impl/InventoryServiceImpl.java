@@ -86,4 +86,13 @@ public class InventoryServiceImpl implements InventoryService{
         }
         return inventoryRepository.save(inventory);
     }
+
+    @Override
+    public boolean checkAvailableQuantity(UUID bookId) {
+        Inventory inventory = inventoryRepository.getInventoryByBookId(bookId);
+        if (inventory == null) {
+            throw new EntityNotFoundException("Inventory not found for bookId: " + bookId);
+        }
+        return inventory.getAvailable() > 0;
+    }
 }
