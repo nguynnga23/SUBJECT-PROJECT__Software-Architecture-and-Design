@@ -3,13 +3,14 @@ package vn.edu.iuh.fit.borrowingservice.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.fit.borrowingservice.annotation.RequireAdmin;
+import vn.edu.iuh.fit.borrowingservice.clients.InventoryServiceClient;
 import vn.edu.iuh.fit.borrowingservice.clients.UserServiceClient;
-import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
-import vn.edu.iuh.fit.borrowingservice.dto.UpdateStatusDTO;
-import vn.edu.iuh.fit.borrowingservice.dto.UserDTO;
+import vn.edu.iuh.fit.borrowingservice.dto.*;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequestDetail;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
@@ -17,9 +18,7 @@ import vn.edu.iuh.fit.borrowingservice.kafka.KafkaBorrowingProducer;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,57 +36,75 @@ public class ReaderRequestService {
     @Autowired
     private KafkaBorrowingProducer producer;
 
+    @Autowired
+    private InventoryServiceClient inventoryServiceClient;
+
     public ReaderRequest createBorrowRequest(ReaderRequestDTO requestDTO) {
-        // Lấy readerId từ HTTP Header do API Gateway truyền xuống
         String readerId = request.getHeader("X-User-Id");
         if (readerId == null || readerId.isEmpty()) {
             throw new IllegalArgumentException("Missing Reader ID in request header.");
         }
 
-        // Kiểm tra thông tin mượn
         if (requestDTO.getBorrowRequestDetails() == null || requestDTO.getBorrowRequestDetails().isEmpty()) {
             throw new IllegalArgumentException("The list of books must not be left blank.");
         }
+
         if (requestDTO.getBorrowingPeriod() == null || requestDTO.getBorrowingPeriod() <= 0) {
             throw new IllegalArgumentException("The borrowing period must be greater than 0 and not left blank.");
         }
 
         try {
-            // Tạo ReaderRequest từ DTO
             ReaderRequest readerRequest = new ReaderRequest();
             readerRequest.setReaderId(UUID.fromString(readerId));
             readerRequest.setStatus(BorrowStatus.PENDING);
             readerRequest.setBorrowingPeriod(requestDTO.getBorrowingPeriod());
             readerRequest.setCreatedAt(LocalDateTime.now());
             readerRequest.setUpdatedAt(LocalDateTime.now());
+            readerRequest.setReturnDate(LocalDateTime.now().plusDays(requestDTO.getBorrowingPeriod()));
 
-            // Tính toán ngày trả sách
-            LocalDateTime returnDate = LocalDateTime.now().plusDays(requestDTO.getBorrowingPeriod());
-            readerRequest.setReturnDate(returnDate);
+            List<ReaderRequestDetail> requestDetails = new ArrayList<>();
 
-            // Map borrowRequestDetails từ DTO sang Entity
-            List<ReaderRequestDetail> requestDetails = requestDTO.getBorrowRequestDetails().stream()
-                    .map(detailDTO -> {
-                        ReaderRequestDetail detail = new ReaderRequestDetail();
-                        detail.setReaderRequest(readerRequest);
-                        detail.setBookCopyId(detailDTO.getBookCopyId());
-                        return detail;
-                    }).collect(Collectors.toList());
+            for (ReaderRequestDetailDTO detailDTO : requestDTO.getBorrowRequestDetails()) {
+                UUID bookId = detailDTO.getBookId();
+
+                // Bước 1: Kiểm tra xem sách có bản sao khả dụng hay không
+                boolean isAvailable = inventoryServiceClient.checkCopyAvailable(bookId).hasBody();
+                if (!isAvailable) {
+                    throw new IllegalArgumentException("No available copies for book with ID " + bookId);
+                }
+
+                // Bước 2: Nếu có bản sao khả dụng, lấy bản sao đầu tiên
+                ResponseEntity<BookCopyDTO> response = (ResponseEntity<BookCopyDTO>) inventoryServiceClient.getAvailableCopy(bookId);
+                if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
+                    throw new IllegalArgumentException("Unable to fetch available copy for book with ID " + bookId);
+                }
+
+                // Lấy BookCopyDTO từ response body
+                BookCopyDTO bookCopyDTO = response.getBody();
+                System.out.println(bookCopyDTO.getId());
+
+                // Tạo chi tiết yêu cầu mượn với bookCopyId và thêm vào danh sách
+                ReaderRequestDetail detail = new ReaderRequestDetail();
+                detail.setReaderRequest(readerRequest);
+                detail.setBookCopyId(bookCopyDTO.getId()); // Sử dụng id của bookCopy
+                requestDetails.add(detail);
+            }
 
             readerRequest.setBorrowRequestDetails(requestDetails);
 
-            // Lưu yêu cầu mượn vào cơ sở dữ liệu
             ReaderRequest savedRequest = readerRequestRepository.save(readerRequest);
 
-            // Gửi thông báo sau khi tạo yêu cầu mượn thành công
             String notificationMessage = "Borrow request created successfully for readerId: " + readerId;
             producer.sendBorrowingEvent(notificationMessage);
 
             return savedRequest;
+
         } catch (RuntimeException e) {
             throw new RuntimeException("Error creating borrow request: " + e.getMessage());
         }
     }
+
+
 
     @RequireAdmin
     public ReaderRequest updateStatus(UUID requestId, UpdateStatusDTO statusDTO) {

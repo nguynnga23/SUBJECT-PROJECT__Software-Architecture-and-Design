@@ -13,4 +13,5 @@ public interface InventoryService {
     boolean deleteInventory(UUID bookId);
     Inventory updateInventory(UUID bookId, Inventory inventory);
     Inventory updateActionInventory(UUID bookId, Status status);
+    boolean checkAvailableQuantity(UUID bookId);
 }
