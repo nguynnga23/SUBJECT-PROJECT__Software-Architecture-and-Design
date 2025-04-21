@@ -2,6 +2,7 @@ package com.example.bookservice.service.impl;
 
 import com.example.bookservice.entity.Author;
 import com.example.bookservice.entity.Book;
+import com.example.bookservice.kafka.BookKafkaProducer;
 import com.example.bookservice.repository.AuthorRepository;
 import com.example.bookservice.repository.BookRepository;
 import com.example.bookservice.service.BookService;
@@ -20,10 +21,14 @@ public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
     @Autowired
     private AuthorRepository authorRepository;
+    @Autowired
+    private BookKafkaProducer kafkaProducer;
 
     @Override
     public Book addBook(Book book) {
-        return bookRepository.save(book);
+        Book savedBook = bookRepository.save(book);
+        kafkaProducer.sendBookCreatedEvent("BookCreated: " + savedBook.getId());
+        return savedBook;
     }
 
     @Override
