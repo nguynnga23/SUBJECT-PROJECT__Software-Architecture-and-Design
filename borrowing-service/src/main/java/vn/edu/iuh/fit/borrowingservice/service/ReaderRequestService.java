@@ -1,5 +1,7 @@
 package vn.edu.iuh.fit.borrowingservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,7 @@ import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequestDetail;
 import vn.edu.iuh.fit.borrowingservice.enums.BorrowStatus;
 import vn.edu.iuh.fit.borrowingservice.kafka.KafkaBorrowingProducer;
+import vn.edu.iuh.fit.borrowingservice.mapper.ReaderRequestMapper;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
@@ -25,14 +28,15 @@ import java.util.stream.Collectors;
 public class ReaderRequestService {
     @Autowired
     private ReaderRequestRepository readerRequestRepository;
-
+    private ReaderRequestMapper mapper = new ReaderRequestMapper();
     @Autowired
     private UserServiceClient userServiceClient;
 
     @Autowired
     private HttpServletRequest request;
 
-
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private KafkaBorrowingProducer producer;
 
@@ -64,7 +68,7 @@ public class ReaderRequestService {
 
             List<ReaderRequestDetail> requestDetails = new ArrayList<>();
 
-            for (ReaderRequestDetailDTO detailDTO : requestDTO.getBorrowRequestDetails()) {
+            for (BorrowRequestDetailDTO detailDTO : requestDTO.getBorrowRequestDetails()) {
                 UUID bookId = detailDTO.getBookId();
 
                 // Bước 1: Kiểm tra xem sách có bản sao khả dụng hay không
@@ -90,17 +94,25 @@ public class ReaderRequestService {
                 requestDetails.add(detail);
             }
 
-            readerRequest.setBorrowRequestDetails(requestDetails);
+            readerRequest.setReaderRequestDetails(requestDetails);
 
             ReaderRequest savedRequest = readerRequestRepository.save(readerRequest);
 
+            // Gửi sự kiện đến Notification Service
             String notificationMessage = "Borrow request created successfully for readerId: " + readerId;
-            producer.sendBorrowingEvent(notificationMessage);
+            producer.sendToNotificationService(notificationMessage);
 
+            // Gửi sự kiện đến Inventory Service
+            // Sau khi lưu borrow request
+            ReaderRequestDTO dto = mapper.mapToDTO(readerRequest);
+            String inventoryMessage = objectMapper.writeValueAsString(dto);
+            producer.sendToInventoryService(inventoryMessage);
             return savedRequest;
 
         } catch (RuntimeException e) {
             throw new RuntimeException("Error creating borrow request: " + e.getMessage());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 

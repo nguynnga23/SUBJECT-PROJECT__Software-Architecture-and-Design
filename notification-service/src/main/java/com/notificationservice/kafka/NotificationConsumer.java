@@ -18,7 +18,7 @@ public class NotificationConsumer {
     private JavaMailSender mailSender  ;
 
     @KafkaListener(
-            topics = "${spring.kafka.topic.borrowing}",
+            topics = "${spring.kafka.topic.borrowing-notification}",
             groupId = "${spring.kafka.consumer.group-id}"
     )
     public void consumeMessage(String message) {

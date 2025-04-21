@@ -1,6 +1,8 @@
 package com.example.inventoryservice.service.impl;
+import com.example.inventoryservice.entity.BookCopy;
 import com.example.inventoryservice.entity.Inventory;
 import com.example.inventoryservice.enums.Status;
+import com.example.inventoryservice.repositories.BookCopyRepository;
 import com.example.inventoryservice.repositories.InventoryRepository;
 import com.example.inventoryservice.service.InventoryService;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,6 +16,8 @@ import java.util.UUID;
 public class InventoryServiceImpl implements InventoryService{
     @Autowired
     private InventoryRepository inventoryRepository;
+    @Autowired
+    private BookCopyRepository bookCopyRepository;
 
     @Override
     public Inventory saveInventory(Inventory inventory) {
@@ -40,10 +44,11 @@ public class InventoryServiceImpl implements InventoryService{
     }
 
     @Override
-    public Inventory updateInventory(UUID bookId, Inventory newInventory) {
-        Inventory inventory = inventoryRepository.getInventoryByBookId(bookId);
+    public Inventory updateInventory(UUID bookCopyId, Inventory newInventory) {
+        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId).orElseThrow(EntityNotFoundException::new);
+        Inventory inventory = inventoryRepository.getInventoryByBookId(bookCopy.getBookId());
         if (inventory == null) {
-            throw new EntityNotFoundException("Inventory not found for bookId: " + bookId);
+            throw new EntityNotFoundException("Inventory not found for bookId: " + bookCopy.getBookId());
         }
         if (newInventory.getBorrowed() != null) {
             inventory.setBorrowed(newInventory.getBorrowed());
@@ -94,5 +99,17 @@ public class InventoryServiceImpl implements InventoryService{
             throw new EntityNotFoundException("Inventory not found for bookId: " + bookId);
         }
         return inventory.getAvailable() > 0;
+    }
+
+    @Override
+    public void updateBookAvailability(UUID bookCopyId) {
+        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId).orElseThrow(EntityNotFoundException::new);
+        Inventory inventory = inventoryRepository.getInventoryByBookId(bookCopy.getBookId());
+        if (inventory == null) {
+            throw new EntityNotFoundException("Inventory not found for bookId: " + bookCopy.getBookId());
+        }
+        inventory.setAvailable(inventory.getAvailable() - 1);
+        inventory.setBorrowed(inventory.getBorrowed() + 1);
+        inventoryRepository.save(inventory);
     }
 }

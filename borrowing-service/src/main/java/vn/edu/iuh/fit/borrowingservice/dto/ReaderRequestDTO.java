@@ -21,6 +21,8 @@ public class ReaderRequestDTO {
     private Integer borrowingPeriod;
 
     // Nếu cần hiển thị chi tiết sách mượn:
-    private List<ReaderRequestDetailDTO> borrowRequestDetails; // Optional
+    private List<ReaderRequestDetailDTO> readerRequestDetails; // Optional
+    // Nếu cần hiển thị chi tiết sách mượn:
+    private List<BorrowRequestDetailDTO> borrowRequestDetails; // Optional
 }
 
