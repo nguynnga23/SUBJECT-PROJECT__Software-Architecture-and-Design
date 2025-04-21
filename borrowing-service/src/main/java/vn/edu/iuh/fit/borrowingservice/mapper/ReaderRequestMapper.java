@@ -1,5 +1,6 @@
 package vn.edu.iuh.fit.borrowingservice.mapper;
 
+import vn.edu.iuh.fit.borrowingservice.dto.BorrowRequestDetailDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDetailDTO;
 import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
@@ -22,15 +23,15 @@ public class ReaderRequestMapper {
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setBorrowingPeriod(entity.getBorrowingPeriod());
         // Map borrowRequestDetails nếu cần
-        if (entity.getBorrowRequestDetails() != null) {
-            List<ReaderRequestDetailDTO> detailDTOs = entity.getBorrowRequestDetails().stream()
+        if (entity.getReaderRequestDetails() != null) {
+            List<ReaderRequestDetailDTO> detailDTOs = entity.getReaderRequestDetails().stream()
                     .map(detail -> {
                         ReaderRequestDetailDTO detailDTO = new ReaderRequestDetailDTO();
-                        detailDTO.setBookId(detail.getBookCopyId());
+                        detailDTO.setBookCopyId(detail.getBookCopyId());
                         return detailDTO;
                     })
                     .collect(Collectors.toList());
-            dto.setBorrowRequestDetails(detailDTOs);
+            dto.setReaderRequestDetails(detailDTOs);
         }
         return dto;
     }

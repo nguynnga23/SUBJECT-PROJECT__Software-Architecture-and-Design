@@ -11,4 +11,6 @@ public interface BookCopyService {
     List<BookCopy> getAllBookCopy();
     String findLatestCopyCode();
     BookCopy findFirstByBookIdAndStatus(UUID bookId, Status status);
+    void updateBookCopyStatus(UUID bookCopyId, Status status);
+
 }

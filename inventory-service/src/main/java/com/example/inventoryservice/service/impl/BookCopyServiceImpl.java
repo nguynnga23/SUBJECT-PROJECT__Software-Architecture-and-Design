@@ -4,6 +4,7 @@ import com.example.inventoryservice.enums.Status;
 import com.example.inventoryservice.repositories.BookCopyRepository;
 import com.example.inventoryservice.repositories.InventoryRepository;
 import com.example.inventoryservice.service.BookCopyService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,13 @@ public class BookCopyServiceImpl implements BookCopyService {
     @Override
     public BookCopy findFirstByBookIdAndStatus(UUID bookId, Status status) {
         return bookCopyRepository.findFirstByBookIdAndStatus(bookId, Status.AVAILABLE);
+    }
+
+    @Override
+    public void updateBookCopyStatus(UUID bookCopyId, Status status) {
+        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId).orElseThrow(EntityNotFoundException::new);
+        bookCopy.setStatus(status);
+        bookCopyRepository.save(bookCopy);
     }
 
 

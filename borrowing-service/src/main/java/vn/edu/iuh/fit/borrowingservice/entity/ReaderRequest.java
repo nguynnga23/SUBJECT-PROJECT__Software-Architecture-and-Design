@@ -57,5 +57,5 @@ public class ReaderRequest {
     private Integer borrowingPeriod;
 
     @OneToMany(mappedBy = "readerRequest", cascade = CascadeType.ALL)
-    private List<ReaderRequestDetail> borrowRequestDetails;
+    private List<ReaderRequestDetail> readerRequestDetails;
 }

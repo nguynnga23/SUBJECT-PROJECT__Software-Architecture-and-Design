@@ -14,4 +14,5 @@ public interface InventoryService {
     Inventory updateInventory(UUID bookId, Inventory inventory);
     Inventory updateActionInventory(UUID bookId, Status status);
     boolean checkAvailableQuantity(UUID bookId);
+    void updateBookAvailability(UUID bookCopyId);
 }
