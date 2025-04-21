@@ -26,51 +26,6 @@ public class InventoryController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addBookCopy(@RequestBody BookCopyRequestDTO request) {
-        UUID bookId = request.getBookId();
-        int quantity = request.getQuantity();
-        String location = request.getLocation();
-
-        Inventory inventory = inventoryService.getInventoryByBookId(bookId);
-
-        if (inventory == null) {
-            Inventory newInventory = new Inventory();
-            newInventory.setAvailable(quantity);
-            newInventory.setTotalQuantity(quantity);
-            newInventory.setLost(0);
-            newInventory.setDamaged(0);
-            newInventory.setBorrowed(0);
-            newInventory.setBookId(bookId);
-            inventory = inventoryService.saveInventory(newInventory);
-        }
-
-        for (int i = 0; i < quantity; i++) {
-            BookCopy bookCopy = new BookCopy();
-            String latestCode = bookCopyService.findLatestCopyCode();
-            int nextNumber = 1;
-            if (latestCode != null && latestCode.startsWith("BC_")) {
-                nextNumber = Integer.parseInt(latestCode.substring(3)) + 1;
-            }
-            String formattedCode = String.format("BC_%03d", nextNumber);
-            bookCopy.setCopyCode(formattedCode);
-            bookCopy.setBookId(bookId);
-            bookCopy.setLocation(location);
-            bookCopy.setStatus(Status.AVAILABLE);
-            bookCopy.setInventory(inventory);
-            bookCopyService.addBookCopy(bookCopy);
-
-            inventory.setTotalQuantity(inventory.getTotalQuantity() + 1);
-            inventory.setAvailable(inventory.getAvailable() + 1);
-        }
-
-        inventoryService.saveInventory(inventory);
-
-        return ResponseEntity.ok(Map.of("message", "Added " + quantity + " book copies successfully"));
-    }
-
-
-
     @GetMapping("/{bookId}")
     public ResponseEntity<?> getBookCopy(@PathVariable UUID bookId) {
         Inventory inventory = inventoryService.getInventoryByBookId(bookId);
