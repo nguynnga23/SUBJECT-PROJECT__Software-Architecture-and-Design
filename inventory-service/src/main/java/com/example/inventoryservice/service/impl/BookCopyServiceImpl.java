@@ -6,6 +6,8 @@ import com.example.inventoryservice.service.BookCopyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookCopyServiceImpl implements BookCopyService {
     @Autowired
@@ -14,6 +16,11 @@ public class BookCopyServiceImpl implements BookCopyService {
     @Override
     public BookCopy addBookCopy(BookCopy bookCopy) {
         return bookCopyRepository.save(bookCopy);
+    }
+
+    @Override
+    public List<BookCopy> getAllBookCopy() {
+        return bookCopyRepository.findAll();
     }
 
     @Override
