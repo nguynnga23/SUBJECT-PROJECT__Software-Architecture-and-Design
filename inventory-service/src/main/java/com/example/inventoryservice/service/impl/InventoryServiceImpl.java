@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,6 +23,11 @@ public class InventoryServiceImpl implements InventoryService{
     @Override
     public Inventory getInventoryByBookId(UUID bookId) {
         return inventoryRepository.getInventoryByBookId(bookId);
+    }
+
+    @Override
+    public List<Inventory> getAllInventory() {
+        return inventoryRepository.findAll();
     }
 
     @Override
