@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+.env
+# Bỏ qua file cấu hình ứng dụng thật
+/src/main/resources/application.properties
+
