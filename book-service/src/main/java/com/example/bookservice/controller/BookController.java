@@ -68,6 +68,16 @@ public class BookController {
         }
     }
 
+    @GetMapping("/{bookId}/exists")
+    public ResponseEntity<Boolean> checkBookExists(@PathVariable UUID bookId) {
+        try {
+            bookService.getBook(bookId);
+            return ResponseEntity.ok(true);
+        } catch (RuntimeException e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+
     @PutMapping("/{bookId}")
     public ResponseEntity<?> updateBook(@PathVariable UUID bookId, @RequestBody BookRequestDTO request){
         Optional<Book> existingBook = bookService.findByBookCode(request.bookCode());
