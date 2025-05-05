@@ -14,15 +14,16 @@ public class CorsGlobalConfiguration {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        corsConfig.setMaxAge(8000L);
+        // Allow origins for development and testing
+        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://hoppscotch.io"));
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        corsConfig.addAllowedHeader("*");
-        corsConfig.setAllowCredentials(true); // Nếu bạn dùng cookie/JWT với credentials
-
+        corsConfig.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-Requested-With"));
+        corsConfig.setExposedHeaders(Arrays.asList("Authorization"));
+//        corsConfig.setAllowCredentials(true);
+        corsConfig.setMaxAge(8000L);
+        corsConfig.setAllowedOrigins(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
-
         return new CorsWebFilter(source);
     }
 }
