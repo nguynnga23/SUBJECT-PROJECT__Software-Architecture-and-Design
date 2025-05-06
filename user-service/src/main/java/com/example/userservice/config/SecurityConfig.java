@@ -33,7 +33,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user-service/users/register", "/api/v1/user-service/users/login", "/api/v1/user-service/users/refresh-token","/api/v1/user-service/users/**").permitAll() // Cho phép truy cập công khai
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/api/v1/user-service/users/register", "/api/v1/user-service/users/login", "/api/v1/user-service/users/refresh-token","/api/v1/user-service/users/**").permitAll() // Cho phép truy cập công khai
                         .anyRequest().authenticated() // Yêu cầu xác thực cho các endpoint khác
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS)) // Không sử dụng session

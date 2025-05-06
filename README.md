@@ -9,6 +9,7 @@ Dự án này bao gồm các service sau:
 - **Borrowing Service**
 - **Inventory Service**
 - **Notification Service**
+- **Recommendation Service**
 
 Các service này giao tiếp với nhau thông qua API Gateway.
 
@@ -50,9 +51,17 @@ Mỗi service sẽ đăng ký với **Eureka Server** và có một cổng riên
 - **Borrowing Service**: `http://localhost:8083`
 - **Inventory Service**: `http://localhost:8084`
 - **Notification Service**: `http://localhost:8085`
-
+- **Recommendation Service**: `http://localhost:8086`
 ---
 ## 4. Kiểm tra API
+
+### Swagger UI URL
+- **User Service**:  http://localhost:8081/swagger-ui/index.html
+- **Book Service**: http://localhost:8082/swagger-ui/index.html
+- **Borrowing Service**: http://localhost:8083/swagger-ui/index.html
+- **Inventory Service**: http://localhost:8084/swagger-ui/index.html
+- **Notification Service**: http://localhost:8085/swagger-ui/index.html
+- **Recommendation Service**: http://localhost:8086/swagger-ui/index.html
 
 ### 4.1. Kiểm tra API của từng service
 #### User Service
@@ -76,6 +85,11 @@ curl -X GET http://localhost:8084/api/v1/inventory-service/inventory
 curl -X GET http://localhost:8085/api/v1/notification-service/notifications
 ```
 
+#### Recommendation Service
+```bash
+curl -X GET http://localhost:8086/api/v1/recommendation-service/recommendations
+```
+
 ### 4.2. Kiểm tra API qua Gateway
 API Gateway sẽ route các request đến các service tương ứng:
 ```bash
@@ -84,6 +98,8 @@ curl -X GET http://localhost:8080/api/v1/book-service/books  # Gửi request đ�
 curl -X GET http://localhost:8080/api/v1/borrowing-service/borrow-requests  # Gửi request đến Borrowing Service qua Gateway
 curl -X GET http://localhost:8080/api/v1/inventory-service/inventory  # Gửi request đến Inventory Service qua Gateway
 curl -X GET http://localhost:8080/api/v1/notification-service/notifications  # Gửi request đến Notification Service qua Gateway
+curl -X GET http://localhost:8080/api/v1/recommendation-service  # Gửi request đến Notification Service qua Gateway
+
 ```
 ---
 ## 5. Kiểm tra đăng ký service trong Eureka
