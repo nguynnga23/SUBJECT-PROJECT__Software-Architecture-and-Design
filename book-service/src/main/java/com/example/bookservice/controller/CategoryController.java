@@ -17,6 +17,11 @@ public class CategoryController {
 
     @Autowired CategoryService categoryService;
 
+    @GetMapping
+    public ResponseEntity<?> getAllCategory() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
     @PostMapping
     public ResponseEntity<?> addCategory(@RequestBody CategoryDTO category) {
 
