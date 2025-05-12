@@ -1,9 +1,6 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dto.AuthenticationRequestDto;
-import com.example.userservice.dto.AuthenticationResponseDto;
-import com.example.userservice.dto.RefreshTokenRequestDto;
-import com.example.userservice.dto.RefreshTokenResponseDto;
+import com.example.userservice.dto.*;
 import com.example.userservice.entity.User;
 import com.example.userservice.service.AuthenticationService;
 import com.example.userservice.service.JwtService;
@@ -252,5 +249,18 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "User not found"));
         }
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestBody PasswordChangeRequestDTO request
+    ){
+       try {
+           authenticationService.changePassword(userId,request.getOldPassword(),request.getNewPassword());
+           return ResponseEntity.ok(Map.of("message","Password changed successfully."));
+
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Password change failed!"));
+       }
     }
 }
