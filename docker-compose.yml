@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   postgres:
     image: postgres:latest
     container_name: postgres-container
@@ -15,6 +14,94 @@ services:
     networks:
       - backend
     restart: always
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+      - redis
+
+  book-service:
+    build: ./book-service
+    container_name: book-service
+    ports:
+      - "8082:8082"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  borrowing-service:
+    build: ./borrowing-service
+    container_name: borrowing-service
+    ports:
+      - "8083:8083"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "8084:8084"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8085:8085"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+  discovery-service:
+    build: ./discovery-service
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  recommendation-service:
+    build: ./recommendation-service
+    container_name: recommendation-service
+    ports:
+      - "8086:8086"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    depends_on:
+      - user-service
+      - book-service
+      - inventory-service
+      - borrowing-service
+#      - notification-service
+#      - recommendation-service
+
+
+
 
   pgadmin:
       image: dpage/pgadmin4:latest
