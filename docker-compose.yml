@@ -56,15 +56,15 @@ services:
     depends_on:
       - postgres
 
-  notification-service:
-    build: ./notification-service
-    container_name: notification-service
-    ports:
-      - "8085:8085"
-    networks:
-      - backend
-    depends_on:
-      - postgres
+  # notification-service:
+  #   build: ./notification-service
+  #   container_name: notification-service
+  #   ports:
+  #     - "8085:8085"
+  #   networks:
+  #     - backend
+  #   depends_on:
+  #     - postgres
   discovery-service:
     build: ./discovery-service
     container_name: discovery-service
@@ -75,15 +75,15 @@ services:
     depends_on:
       - postgres
 
-  recommendation-service:
-    build: ./recommendation-service
-    container_name: recommendation-service
-    ports:
-      - "8086:8086"
-    networks:
-      - backend
-    depends_on:
-      - postgres
+  # recommendation-service:
+  #   build: ./recommendation-service
+  #   container_name: recommendation-service
+  #   ports:
+  #     - "8086:8086"
+  #   networks:
+  #     - backend
+  #   depends_on:
+  #     - postgres
 
   gateway-service:
     build: ./gateway-service
