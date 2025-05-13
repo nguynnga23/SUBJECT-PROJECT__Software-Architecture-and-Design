@@ -16,4 +16,8 @@ public interface BookCopyService {
     List<BookCopy> findByBookId(UUID bookId);
     List<BookCopy> findByStatus(Status status);
     void deleteBookCopyById(UUID bookCopyId);
+    Long getTotalBooks();
+    Long getTotalBorrowedBooks();
+    Long getTotalAvailableBooks();
+    Long getTotalLostOrDamagedBooks();
 }

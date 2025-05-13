@@ -65,4 +65,24 @@ public class BookCopyServiceImpl implements BookCopyService {
         }
         bookCopyRepository.deleteById(bookCopyId);
     }
+    // Tổng số sách trong kho
+    public Long getTotalBooks() {
+        return bookCopyRepository.countTotalBooks();
+    }
+
+    // Tổng số sách đang mượn
+    public Long getTotalBorrowedBooks() {
+        return bookCopyRepository.countBorrowedBooks();
+    }
+
+    // Tổng số sách có sẵn
+    public Long getTotalAvailableBooks() {
+        return bookCopyRepository.countAvailableBooks();
+    }
+
+    // Tổng số sách bị mất/hư hỏng
+    public Long getTotalLostOrDamagedBooks() {
+        return bookCopyRepository.countLostOrDamagedBooks();
+    }
+
 }

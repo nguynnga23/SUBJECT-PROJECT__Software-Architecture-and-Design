@@ -136,4 +136,27 @@ public class BookCopyController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+    // API tổng số sách trong kho
+    @GetMapping("/statistics/total")
+    public ResponseEntity<Long> getTotalBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalBooks());
+    }
+
+    // API tổng số sách đang mượn
+    @GetMapping("/statistics/borrowed")
+    public ResponseEntity<Long> getTotalBorrowedBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalBorrowedBooks());
+    }
+
+    // API tổng số sách có sẵn
+    @GetMapping("/statistics/available")
+    public ResponseEntity<Long> getTotalAvailableBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalAvailableBooks());
+    }
+
+    // API tổng số sách bị mất/hư hỏng
+    @GetMapping("/statistics/lost-or-damaged")
+    public ResponseEntity<Long> getTotalLostOrDamagedBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalLostOrDamagedBooks());
+    }
 }
