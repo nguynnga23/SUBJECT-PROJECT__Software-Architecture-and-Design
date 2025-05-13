@@ -3,17 +3,14 @@ FROM gradle:8-jdk21-alpine AS builder
 
 WORKDIR /app
 
-# Copy wrapper và file cấu hình (để chỉ build dependencies trước)
-COPY gradlew .
+COPY build.gradle settings.gradle ./
 COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
 COPY src src
 
-# Build thật sự
-RUN ./gradlew clean build -x test
+# Không dùng wrapper nữa
+RUN gradle clean build -x test
 
-# Stage 2: Chạy ứng dụng
+# Stage 2: Run app
 FROM openjdk:21-jdk-slim
 
 WORKDIR /app

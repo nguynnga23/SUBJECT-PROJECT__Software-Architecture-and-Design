@@ -9,7 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-dbs.sh:/docker-entrypoint-initdb.d/init-dbs.sh
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
     networks:
       - backend
     restart: always
@@ -116,10 +116,6 @@ services:
       - borrowing-service
 #      - notification-service
 #      - recommendation-service
-
-
-
-
   pgadmin:
       image: dpage/pgadmin4:latest
       container_name: pgadmin4-container
@@ -174,8 +170,11 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
     networks:
       - backend
+
   kafka:
     image: confluentinc/cp-kafka
     container_name: kafka
@@ -186,7 +185,11 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_LISTENER_NAME_PLAINTEXT_PORT: 9092
+      KAFKA_LISTENER_NAME_PLAINTEXT_HOSTNAME: 0.0.0.0
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENER_NAME_PLAINTEXT_VERSIONS: 1.0
     depends_on:
       - zookeeper
     networks:

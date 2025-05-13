@@ -24,3 +24,5 @@ COPY --from=builder /app/build/libs/gateway-service-*-SNAPSHOT.jar app.jar
 COPY --from=builder /app/src/main/resources /app/resources
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
