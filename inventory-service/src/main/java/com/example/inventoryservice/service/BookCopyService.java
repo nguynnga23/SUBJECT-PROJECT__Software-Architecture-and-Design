@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface BookCopyService {
     BookCopy addBookCopy(BookCopy bookCopy);
+    BookCopy getBookCopyById(UUID bookCopyId);
     List<BookCopy> getAllBookCopy();
     String findLatestCopyCode();
     BookCopy findFirstByBookIdAndStatus(UUID bookId, Status status);

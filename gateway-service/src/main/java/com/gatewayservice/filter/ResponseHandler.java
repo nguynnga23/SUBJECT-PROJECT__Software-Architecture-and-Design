@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class ResponseHandler {
     public Mono<Void> unauthorizedResponse(ServerWebExchange exchange) {
@@ -26,6 +28,12 @@ public class ResponseHandler {
     public Mono<Void> badRequestResponse(ServerWebExchange exchange) {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.BAD_REQUEST);
-        return response.setComplete();
+//        return response.setComplete();
+        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, "application/json");
+
+        String body = "{\"error\": \"Token is not valid.\"}";
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(bytes)));
     }
 }

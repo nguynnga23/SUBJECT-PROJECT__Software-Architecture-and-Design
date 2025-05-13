@@ -28,7 +28,8 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
             "/api/v1/user-service/users/login",
-            "/api/v1/user-service/users/register"
+            "/api/v1/user-service/users/register",
+            "/api/v1/book-service/books"
     );
 
     @Override

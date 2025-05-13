@@ -15,4 +15,7 @@ public interface InventoryServiceClient {
 
     @GetMapping("/api/v1/inventory-service/copies/available-copy/{bookId}")
     ResponseEntity<BookCopyDTO> getAvailableCopy(@PathVariable UUID bookId);
+
+    @GetMapping("/api/v1/inventory-service/copies/{bookCopyId}")
+    BookCopyDTO getBookCopyById(@PathVariable UUID bookCopyId);
 }
