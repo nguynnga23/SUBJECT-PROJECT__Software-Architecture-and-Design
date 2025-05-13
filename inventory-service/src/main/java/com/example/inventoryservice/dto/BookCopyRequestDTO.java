@@ -7,7 +7,12 @@ public class BookCopyRequestDTO {
     private int quantity;
     private String location;
 
-    // Getters & Setters
+    public BookCopyRequestDTO() {
+
+    }
+
+    public BookCopyRequestDTO(UUID bookId, int quantity, String location) {}
+
     public UUID getBookId() {
         return bookId;
     }
