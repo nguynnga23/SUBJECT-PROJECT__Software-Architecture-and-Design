@@ -1,8 +1,8 @@
 package com.example.inventoryservice.controller;
 
-//import com.example.inventoryservice.dto.BookCopyRequestDTO;
 import com.example.inventoryservice.dto.BookCopyDTO;
 import com.example.inventoryservice.dto.BookCopyRequestDTO;
+import com.example.inventoryservice.dto.BookCopyUpdateDTO;
 import com.example.inventoryservice.entity.BookCopy;
 import com.example.inventoryservice.entity.Inventory;
 import com.example.inventoryservice.enums.Status;
@@ -81,11 +81,19 @@ public class BookCopyController {
         return ResponseEntity.ok(bookCopy);
     }
 
-//    @PostMapping
-//    public ResponseEntity<BookCopy> addBookCopy(@RequestBody BookCopy bookCopy) {
-//        BookCopy savedBookCopy = bookCopyService.addBookCopy(bookCopy);
-//        return ResponseEntity.ok(savedBookCopy);
-//    }
+    @PutMapping("/{bookCopyId}")
+    public ResponseEntity<?> updateBookCopy(@PathVariable UUID bookCopyId, @RequestBody BookCopyUpdateDTO bookCopyDTO) {
+        try {
+            BookCopy existingBookCopy = bookCopyService.getBookCopyById(bookCopyId);
+            existingBookCopy.setLocation(bookCopyDTO.getLocation());
+            existingBookCopy.setStatus(bookCopyDTO.getStatus());
+            BookCopy updatedBookCopy = bookCopyService.addBookCopy(existingBookCopy);
+            return ResponseEntity.ok(bookCopyMapper.mapToDto(updatedBookCopy));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @GetMapping("/latest-copy-code")
     public ResponseEntity<String> getLatestCopyCode() {
@@ -105,6 +113,27 @@ public class BookCopyController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to fetch available copy"));
+        }
+    }
+
+    @GetMapping("/by-book/{bookId}")
+    public ResponseEntity<?> getBookCopiesByBookId(@PathVariable UUID bookId) {
+        return ResponseEntity.ok(bookCopyService.findByBookId(bookId));
+    }
+
+    @GetMapping("/by-status/{status}")
+    public ResponseEntity<?> getBookCopiesByStatus(@PathVariable Status status) {
+        return ResponseEntity.ok(bookCopyService.findByStatus(status));
+    }
+
+    @DeleteMapping("/{bookCopyId}")
+    public ResponseEntity<?> deleteBookCopyById(@PathVariable UUID bookCopyId) {
+        try {
+            bookCopyService.deleteBookCopyById(bookCopyId);
+            return ResponseEntity.ok(Map.of("message", "Book copy deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }
