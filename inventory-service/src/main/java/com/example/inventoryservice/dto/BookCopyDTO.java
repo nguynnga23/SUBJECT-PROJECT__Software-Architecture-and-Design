@@ -1,34 +1,17 @@
 package com.example.inventoryservice.dto;
 
-import com.example.inventoryservice.entity.Inventory;
-import com.example.inventoryservice.enums.Status;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
+import com.example.inventoryservice.dto.BookDTO;
 
 import java.util.UUID;
 
 public class BookCopyDTO {
     private UUID id;
-
-
-    private String copyCode;
-
-    private String location;
-
-    private Status status;
     private BookDTO book;
+    private String copyCode;
+    private String location;
+    private String status; // "AVAILABLE", "BORROWED", etc.
 
-    public BookCopyDTO(UUID id, String copyCode, String location, Status status, BookDTO book) {
-        this.id = id;
-        this.copyCode = copyCode;
-        this.location = location;
-        this.status = status;
-        this.book = book;
-    }
-
-    public BookCopyDTO() {
-    }
-
+    // Getters and Setters
     public UUID getId() {
         return id;
     }
@@ -61,22 +44,12 @@ public class BookCopyDTO {
         this.location = location;
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
-
-    @Override
-    public String toString() {
-        return "BookCopyDTO{" +
-                "id=" + id +
-                ", book=" + book +
-                ", copyCode='" + copyCode + '\'' +
-                ", location='" + location + '\'' +
-                ", status=" + status +
-                '}';
-    }
 }
+

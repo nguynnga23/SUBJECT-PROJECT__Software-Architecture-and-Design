@@ -1,10 +1,5 @@
 package com.example.inventoryservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class BookDTO {

@@ -33,8 +33,16 @@ public class ReaderRequestController {
         return ResponseEntity.ok(responseDTO);
     }
 
-
-
+    @GetMapping
+    public ResponseEntity<List<ReaderRequestDTO>> getReaderRequests() {
+        List<ReaderRequest> readerRequests = readerRequestService.getListBorrowRequest();
+        List<ReaderRequestDTO> readerRequestDTOs = new ArrayList<>();
+        for(ReaderRequest readerRequest : readerRequests) {
+            ReaderRequestDTO readerRequestDTO = mapper.mapToDTO(readerRequest);
+            readerRequestDTOs.add(readerRequestDTO);
+        }
+        return ResponseEntity.ok(readerRequestDTOs);
+    }
     @PutMapping("/{requestId}/status")
     public ResponseEntity<ReaderRequestDTO> updateStatus(@PathVariable UUID requestId, @RequestBody UpdateStatusDTO statusDTO) {
         // Chuyển DTO thành Entity
