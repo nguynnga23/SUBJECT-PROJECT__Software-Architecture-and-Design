@@ -71,6 +71,11 @@ public class BookCopyController {
         return ResponseEntity.ok(bookCopyService.getAllBookCopy());
     }
 
+    @GetMapping("/{bookCopyId}")
+    public ResponseEntity<?> getBookCopyById(@RequestParam UUID bookCopyId) {
+        return ResponseEntity.ok(bookCopyService.getBookCopyById(bookCopyId));
+    }
+
 //    @PostMapping
 //    public ResponseEntity<BookCopy> addBookCopy(@RequestBody BookCopy bookCopy) {
 //        BookCopy savedBookCopy = bookCopyService.addBookCopy(bookCopy);

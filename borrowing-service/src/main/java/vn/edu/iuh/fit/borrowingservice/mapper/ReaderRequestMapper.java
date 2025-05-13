@@ -1,5 +1,9 @@
 package vn.edu.iuh.fit.borrowingservice.mapper;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vn.edu.iuh.fit.borrowingservice.clients.InventoryServiceClient;
+import vn.edu.iuh.fit.borrowingservice.dto.BookCopyDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.BorrowRequestDetailDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDetailDTO;
@@ -7,8 +11,11 @@ import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Component
 public class ReaderRequestMapper {
+    @Autowired
+    private InventoryServiceClient inventoryServiceClient;
+
     public ReaderRequestDTO mapToDTO(ReaderRequest entity) {
         ReaderRequestDTO dto = new ReaderRequestDTO();
         dto.setId(entity.getId());
@@ -27,7 +34,7 @@ public class ReaderRequestMapper {
             List<ReaderRequestDetailDTO> detailDTOs = entity.getReaderRequestDetails().stream()
                     .map(detail -> {
                         ReaderRequestDetailDTO detailDTO = new ReaderRequestDetailDTO();
-                        detailDTO.setBookCopyId(detail.getBookCopyId());
+                        detailDTO.setBookCopyId(inventoryServiceClient.getBookCopyById(detail.getBookCopyId()));
                         return detailDTO;
                     })
                     .collect(Collectors.toList());
