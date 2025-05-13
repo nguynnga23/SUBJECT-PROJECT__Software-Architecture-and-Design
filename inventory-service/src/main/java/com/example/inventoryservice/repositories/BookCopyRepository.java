@@ -15,4 +15,6 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
     @Query("SELECT bc.copyCode FROM BookCopy bc WHERE bc.copyCode LIKE 'BC_%' ORDER BY bc.copyCode DESC LIMIT 1")
     String findLatestCopyCode();
     BookCopy findFirstByBookIdAndStatus(UUID bookId, Status status);
+    List<BookCopy> findByBookIdAndStatus(UUID bookId, Status status);
+    List<BookCopy> findByStatus(Status status);
 }
