@@ -1,5 +1,23 @@
-FROM openjdk:21-jdk-slim
+# Stage 1: Build ứng dụng
+FROM gradle:8-jdk21-alpine AS builder
+
 WORKDIR /app
-RUN /gradlew clean build -x test
-COPY build/libs/user-service-0.0.1-SNAPSHOT.jar app.jar
+
+# Copy wrapper và file cấu hình (để chỉ build dependencies trước)
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY src src
+
+# Build thật sự
+RUN ./gradlew clean build -x test
+
+# Stage 2: Chạy ứng dụng
+FROM openjdk:21-jdk-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/user-service-*-SNAPSHOT.jar app.jar
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
