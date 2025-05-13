@@ -2,6 +2,7 @@ package com.example.userservice.controller;
 
 import com.example.userservice.dto.*;
 import com.example.userservice.entity.User;
+import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.service.AuthenticationService;
 import com.example.userservice.service.JwtService;
 import com.example.userservice.service.UserRedisService;
@@ -28,9 +29,15 @@ public class UserController {
     private UserService userService;
     @Autowired
     private AuthenticationService authenticationService;
-
+    @Autowired
+    private UserMapper userMapper;
     @Autowired
     private JwtService jwtService;
+
+    @GetMapping("{userId}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable UUID userId) {
+        return ResponseEntity.ok(userMapper.toUserDTO(userService.getUserById(userId)));
+    }
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable UUID userId,
