@@ -256,9 +256,7 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
             @RequestBody PasswordChangeRequestDTO request
     ){
        try {
-           authenticationService.changePassword(userId,request.getOldPassword(),request.getNewPassword());
-           return ResponseEntity.ok(Map.of("message","Password changed successfully."));
-
+           return authenticationService.changePassword(userId,request.getOldPassword(),request.getNewPassword());
        } catch (Exception e) {
            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Password change failed!"));
        }
