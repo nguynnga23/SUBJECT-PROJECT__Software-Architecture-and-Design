@@ -24,7 +24,7 @@ public class BookCopyMapper {
         bookCopyDTO.setBook(bookServiceClient.getBookById(bookCopy.getBookId()));
         bookCopyDTO.setCopyCode(bookCopy.getCopyCode());
         bookCopyDTO.setLocation(bookCopy.getLocation());
-        bookCopyDTO.setStatus(bookCopy.getStatus());
+        bookCopyDTO.setStatus(String.valueOf(bookCopy.getStatus()));
         return bookCopyDTO;
     }
 }

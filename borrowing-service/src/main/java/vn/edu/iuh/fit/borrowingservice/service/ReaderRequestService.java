@@ -117,8 +117,6 @@ public class ReaderRequestService {
         }
     }
 
-
-
     @RequireAdmin
     public ReaderRequest updateStatus(UUID requestId, UpdateStatusDTO statusDTO) {
         ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
@@ -175,6 +173,9 @@ public class ReaderRequestService {
         }
     }
 
+    public List<ReaderRequest> getListBorrowRequest() {
+        return readerRequestRepository.findAll();
+    }
     public List<ReaderRequest> getBorrowHistory() {
         String readerId = request.getHeader("X-User-Id");
         if (readerId == null || readerId.isEmpty()) {

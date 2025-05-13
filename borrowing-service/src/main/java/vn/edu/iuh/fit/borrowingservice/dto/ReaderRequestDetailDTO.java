@@ -5,5 +5,5 @@ import lombok.Data;
 import java.util.UUID;
 @Data
 public class ReaderRequestDetailDTO {
-    private BookCopyDTO bookCopyId;
+    private BookCopyDTO bookCopy;
 }
