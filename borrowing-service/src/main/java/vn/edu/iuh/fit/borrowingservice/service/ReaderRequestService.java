@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.fit.borrowingservice.annotation.RequireAdmin;
 import vn.edu.iuh.fit.borrowingservice.clients.InventoryServiceClient;
@@ -22,7 +20,6 @@ import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ReaderRequestService {
@@ -182,5 +179,23 @@ public class ReaderRequestService {
             throw new IllegalArgumentException("Missing Reader ID in request header.");
         }
         return readerRequestRepository.findByReaderId(UUID.fromString(readerId));
+    }
+
+    public ReaderRequest cancelBorrowRequest(UUID requestId) {
+        ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
+
+        if (!readerRequest.getStatus().equals(BorrowStatus.PENDING)) {
+            throw new IllegalArgumentException("Only pending requests can be canceled.");
+        }
+
+        readerRequest.setStatus(BorrowStatus.CANCELED);
+        readerRequest.setUpdatedAt(LocalDateTime.now());
+        readerRequestRepository.save(readerRequest);
+
+        // Optionally, send a notification or event for the cancellation
+        // String notificationMessage = "Borrow request with ID " + requestId + " has been canceled.";
+        // producer.sendToNotificationService(notificationMessage);
+        return readerRequest;
     }
 }
