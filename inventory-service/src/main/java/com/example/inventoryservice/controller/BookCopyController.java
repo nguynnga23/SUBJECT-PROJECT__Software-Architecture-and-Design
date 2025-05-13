@@ -72,7 +72,7 @@ public class BookCopyController {
     }
 
     @GetMapping("/{bookCopyId}")
-    public ResponseEntity<?> getBookCopyById(@RequestParam UUID bookCopyId) {
+    public ResponseEntity<?> getBookCopyById(@PathVariable UUID bookCopyId) {
         return ResponseEntity.ok(bookCopyService.getBookCopyById(bookCopyId));
     }
 
