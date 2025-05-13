@@ -18,6 +18,7 @@ import vn.edu.iuh.fit.borrowingservice.kafka.KafkaBorrowingProducer;
 import vn.edu.iuh.fit.borrowingservice.mapper.ReaderRequestMapper;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -197,5 +198,15 @@ public class ReaderRequestService {
         // String notificationMessage = "Borrow request with ID " + requestId + " has been canceled.";
         // producer.sendToNotificationService(notificationMessage);
         return readerRequest;
+    }
+
+    public BorrowingStatisticsDTO getBorrowingStatistics() {
+        BorrowingStatisticsDTO statisticsDTO = new BorrowingStatisticsDTO();
+        statisticsDTO.setTotalRequests(readerRequestRepository.countAllRequests());
+        statisticsDTO.setCanceledRequests(readerRequestRepository.countCanceledRequests());
+        statisticsDTO.setPendingRequests(readerRequestRepository.countPendingRequests());
+        statisticsDTO.setApprovedRequests(readerRequestRepository.countApprovedRequests());
+        statisticsDTO.setOverdueRequests(readerRequestRepository.countOverdueRequests());
+        return statisticsDTO;
     }
 }
