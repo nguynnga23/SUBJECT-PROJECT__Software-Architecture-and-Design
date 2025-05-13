@@ -236,9 +236,6 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
         }
     }
 
-
-
-
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
         boolean isDeleted = userService.deleteUser(userId);
@@ -252,11 +249,10 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
     }
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(
-            @RequestHeader("X-User-Id") UUID userId,
             @RequestBody PasswordChangeRequestDTO request
     ){
        try {
-           return authenticationService.changePassword(userId,request.getOldPassword(),request.getNewPassword());
+           return authenticationService.changePassword(request.getOldPassword(),request.getNewPassword());
        } catch (Exception e) {
            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Password change failed!"));
        }

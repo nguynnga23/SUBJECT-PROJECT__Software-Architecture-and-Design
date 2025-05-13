@@ -38,7 +38,7 @@ public class ReaderRequestMapper {
             List<ReaderRequestDetailDTO> detailDTOs = entity.getReaderRequestDetails().stream()
                     .map(detail -> {
                         ReaderRequestDetailDTO detailDTO = new ReaderRequestDetailDTO();
-                        detailDTO.setBookCopyId(inventoryServiceClient.getBookCopyById(detail.getBookCopyId()));
+                        detailDTO.setBookCopy(inventoryServiceClient.getBookCopyById(detail.getBookCopyId()));
                         return detailDTO;
                     })
                     .collect(Collectors.toList());
