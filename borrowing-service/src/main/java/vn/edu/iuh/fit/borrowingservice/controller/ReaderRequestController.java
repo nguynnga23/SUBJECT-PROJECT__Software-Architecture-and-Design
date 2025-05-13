@@ -54,7 +54,17 @@ public class ReaderRequestController {
         // Trả về DTO đã map
         return ResponseEntity.ok(responseDTO);
     }
+    @PutMapping("/{requestId}/canceled")
+    public ResponseEntity<ReaderRequestDTO> updateStatus(@PathVariable UUID requestId) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.cancelBorrowRequest(requestId);
 
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
+    }
     @PutMapping("/{requestId}/borrow")
     public ResponseEntity<ReaderRequestDTO> updateBorrowDate(@PathVariable UUID requestId) {
         // Chuyển DTO thành Entity
