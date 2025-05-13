@@ -19,7 +19,8 @@ import java.util.UUID;
 public class ReaderRequestController {
     @Autowired
     private ReaderRequestService readerRequestService;
-    private ReaderRequestMapper mapper = new ReaderRequestMapper();
+    @Autowired
+    private ReaderRequestMapper mapper;
     @PostMapping
     public ResponseEntity<ReaderRequestDTO> createRequest(@RequestBody ReaderRequestDTO requestDTO) {
         // Chuyển DTO thành Entity

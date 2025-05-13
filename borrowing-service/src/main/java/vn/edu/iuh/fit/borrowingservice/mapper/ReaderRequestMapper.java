@@ -11,10 +11,14 @@ import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Component
 public class ReaderRequestMapper {
+    private final InventoryServiceClient inventoryServiceClient;
     @Autowired
-    private InventoryServiceClient inventoryServiceClient;
+    public ReaderRequestMapper(InventoryServiceClient inventoryServiceClient) {
+        this.inventoryServiceClient = inventoryServiceClient;
+    }
 
     public ReaderRequestDTO mapToDTO(ReaderRequest entity) {
         ReaderRequestDTO dto = new ReaderRequestDTO();
