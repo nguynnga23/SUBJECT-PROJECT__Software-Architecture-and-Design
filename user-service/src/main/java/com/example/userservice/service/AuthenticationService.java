@@ -126,16 +126,22 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         // Trả về response chứa access token mới và refresh token cũ
         return new RefreshTokenResponseDto(newAccessToken, refreshToken);
     }
-    public void changePassword(UUID userId, String oldPassword, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<?> changePassword(UUID userId, String oldPassword, String newPassword) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.ok(Map.of("error", "User not found."));
+        }
+        User user = optionalUser.get();
 
         if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
-            throw new RuntimeException("Old password is incorrect");
+            return ResponseEntity.ok(Map.of("error","OldPassword does not match."));
         }
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+         userRepository.save(user);
+         return ResponseEntity.ok(Map.of("error","Password changed successfully."));
     }
 
 }
