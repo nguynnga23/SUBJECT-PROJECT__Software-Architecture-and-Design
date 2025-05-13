@@ -12,13 +12,13 @@ import java.util.UUID;
 @Getter
 @Data
 public class ReaderRequestDetailDTO {
-    private UUID bookCopyId;
+    private BookCopyDTO bookCopy;
 
     @JsonCreator
     public ReaderRequestDetailDTO(
-        @JsonProperty("bookCopyId") UUID bookCopyId
+        @JsonProperty("bookCopyId") BookCopyDTO bookCopy
     ) {
-        this.bookCopyId = bookCopyId;
+        this.bookCopy = bookCopy;
     }
 
     public ReaderRequestDetailDTO() {

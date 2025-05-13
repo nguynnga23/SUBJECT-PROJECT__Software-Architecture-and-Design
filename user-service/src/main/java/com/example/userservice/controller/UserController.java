@@ -1,9 +1,6 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dto.AuthenticationRequestDto;
-import com.example.userservice.dto.AuthenticationResponseDto;
-import com.example.userservice.dto.RefreshTokenRequestDto;
-import com.example.userservice.dto.RefreshTokenResponseDto;
+import com.example.userservice.dto.*;
 import com.example.userservice.entity.User;
 import com.example.userservice.service.AuthenticationService;
 import com.example.userservice.service.JwtService;
@@ -239,9 +236,6 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
         }
     }
 
-
-
-
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
         boolean isDeleted = userService.deleteUser(userId);
@@ -252,5 +246,15 @@ public ResponseEntity<?> refreshToken(@CookieValue(value = "refreshToken", requi
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "User not found"));
         }
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody PasswordChangeRequestDTO request
+    ){
+       try {
+           return authenticationService.changePassword(request.getOldPassword(),request.getNewPassword());
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Password change failed!"));
+       }
     }
 }

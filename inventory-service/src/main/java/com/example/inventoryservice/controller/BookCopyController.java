@@ -1,9 +1,12 @@
 package com.example.inventoryservice.controller;
 
+//import com.example.inventoryservice.dto.BookCopyRequestDTO;
+import com.example.inventoryservice.dto.BookCopyDTO;
 import com.example.inventoryservice.dto.BookCopyRequestDTO;
 import com.example.inventoryservice.entity.BookCopy;
 import com.example.inventoryservice.entity.Inventory;
 import com.example.inventoryservice.enums.Status;
+import com.example.inventoryservice.mapper.BookCopyMapper;
 import com.example.inventoryservice.service.BookCopyService;
 import com.example.inventoryservice.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,8 @@ public class BookCopyController {
     private InventoryService inventoryService;
     @Autowired
     private BookCopyService bookCopyService;
-
+    @Autowired
+    private BookCopyMapper bookCopyMapper;
     @PostMapping
     public ResponseEntity<?> addBookCopy(@RequestBody BookCopyRequestDTO request) {
         UUID bookId = request.getBookId();
@@ -69,6 +73,12 @@ public class BookCopyController {
     @GetMapping
     public ResponseEntity<?> getAllBookCopies() {
         return ResponseEntity.ok(bookCopyService.getAllBookCopy());
+    }
+
+    @GetMapping("/{bookCopyId}")
+    public ResponseEntity<BookCopyDTO> getBookCopyById(@PathVariable UUID bookCopyId) {
+        BookCopyDTO bookCopy = bookCopyMapper.mapToDto(bookCopyService.getBookCopyById(bookCopyId));
+        return ResponseEntity.ok(bookCopy);
     }
 
 //    @PostMapping
