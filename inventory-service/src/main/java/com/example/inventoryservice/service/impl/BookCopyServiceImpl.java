@@ -22,6 +22,11 @@ public class BookCopyServiceImpl implements BookCopyService {
     }
 
     @Override
+    public BookCopy getBookCopyById(UUID bookCopyId) {
+        return bookCopyRepository.findById(bookCopyId).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
     public List<BookCopy> getAllBookCopy() {
         return bookCopyRepository.findAll();
     }
