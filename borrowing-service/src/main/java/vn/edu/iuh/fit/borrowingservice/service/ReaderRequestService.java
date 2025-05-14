@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import vn.edu.iuh.fit.borrowingservice.annotation.RequireAdmin;
 import vn.edu.iuh.fit.borrowingservice.clients.InventoryServiceClient;
@@ -20,15 +18,16 @@ import vn.edu.iuh.fit.borrowingservice.kafka.KafkaBorrowingProducer;
 import vn.edu.iuh.fit.borrowingservice.mapper.ReaderRequestMapper;
 import vn.edu.iuh.fit.borrowingservice.repository.ReaderRequestRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ReaderRequestService {
     @Autowired
     private ReaderRequestRepository readerRequestRepository;
-    private ReaderRequestMapper mapper = new ReaderRequestMapper();
+    @Autowired
+    private ReaderRequestMapper mapper;
     @Autowired
     private UserServiceClient userServiceClient;
 
@@ -116,8 +115,6 @@ public class ReaderRequestService {
         }
     }
 
-
-
     @RequireAdmin
     public ReaderRequest updateStatus(UUID requestId, UpdateStatusDTO statusDTO) {
         ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
@@ -174,11 +171,42 @@ public class ReaderRequestService {
         }
     }
 
+    public List<ReaderRequest> getListBorrowRequest() {
+        return readerRequestRepository.findAll();
+    }
     public List<ReaderRequest> getBorrowHistory() {
         String readerId = request.getHeader("X-User-Id");
         if (readerId == null || readerId.isEmpty()) {
             throw new IllegalArgumentException("Missing Reader ID in request header.");
         }
         return readerRequestRepository.findByReaderId(UUID.fromString(readerId));
+    }
+
+    public ReaderRequest cancelBorrowRequest(UUID requestId) {
+        ReaderRequest readerRequest = readerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Not found requestId"));
+
+        if (!readerRequest.getStatus().equals(BorrowStatus.PENDING)) {
+            throw new IllegalArgumentException("Only pending requests can be canceled.");
+        }
+
+        readerRequest.setStatus(BorrowStatus.CANCELED);
+        readerRequest.setUpdatedAt(LocalDateTime.now());
+        readerRequestRepository.save(readerRequest);
+
+        // Optionally, send a notification or event for the cancellation
+        // String notificationMessage = "Borrow request with ID " + requestId + " has been canceled.";
+        // producer.sendToNotificationService(notificationMessage);
+        return readerRequest;
+    }
+
+    public BorrowingStatisticsDTO getBorrowingStatistics() {
+        BorrowingStatisticsDTO statisticsDTO = new BorrowingStatisticsDTO();
+        statisticsDTO.setTotalRequests(readerRequestRepository.countAllRequests());
+        statisticsDTO.setCanceledRequests(readerRequestRepository.countCanceledRequests());
+        statisticsDTO.setPendingRequests(readerRequestRepository.countPendingRequests());
+        statisticsDTO.setApprovedRequests(readerRequestRepository.countApprovedRequests());
+        statisticsDTO.setOverdueRequests(readerRequestRepository.countOverdueRequests());
+        return statisticsDTO;
     }
 }
