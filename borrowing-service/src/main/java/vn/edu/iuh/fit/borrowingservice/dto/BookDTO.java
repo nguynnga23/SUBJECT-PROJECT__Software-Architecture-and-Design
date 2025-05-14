@@ -1,5 +1,4 @@
-package com.example.inventoryservice.dto;
-
+package vn.edu.iuh.fit.borrowingservice.dto;
 import java.util.UUID;
 
 public class BookDTO {

@@ -7,14 +7,17 @@ import com.example.userservice.dto.RefreshTokenResponseDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +27,15 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-
+    @Autowired
+    private HttpServletRequest request;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final Set<String> blacklistedTokens = new HashSet<>(); // Danh sách đen token
+    private final PasswordEncoder passwordEncoder;
 
-//    Get userId By Token
+    //    Get userId By Token
 public String getUserIdFromToken(String token) {
     try {
         // Giải mã token và trích xuất username (hoặc userId) từ token
@@ -124,4 +129,27 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         // Trả về response chứa access token mới và refresh token cũ
         return new RefreshTokenResponseDto(newAccessToken, refreshToken);
     }
+    public ResponseEntity<?> changePassword(String oldPassword, String newPassword) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+        String userId = request.getHeader("X-User-Id");
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("Missing User ID in request header.");
+        }
+
+        Optional<User> optionalUser = userRepository.findById(UUID.fromString(userId));
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.ok(Map.of("error", "User not found."));
+        }
+        User user = optionalUser.get();
+
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            return ResponseEntity.ok(Map.of("error","OldPassword does not match."));
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+         userRepository.save(user);
+         return ResponseEntity.ok(Map.of("error","Password changed successfully."));
+    }
+
 }

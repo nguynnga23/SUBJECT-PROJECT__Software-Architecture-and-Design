@@ -1,9 +1,12 @@
 package com.example.inventoryservice.controller;
 
+import com.example.inventoryservice.dto.BookCopyDTO;
 import com.example.inventoryservice.dto.BookCopyRequestDTO;
+import com.example.inventoryservice.dto.BookCopyUpdateDTO;
 import com.example.inventoryservice.entity.BookCopy;
 import com.example.inventoryservice.entity.Inventory;
 import com.example.inventoryservice.enums.Status;
+import com.example.inventoryservice.mapper.BookCopyMapper;
 import com.example.inventoryservice.service.BookCopyService;
 import com.example.inventoryservice.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,8 @@ public class BookCopyController {
     private InventoryService inventoryService;
     @Autowired
     private BookCopyService bookCopyService;
-
+    @Autowired
+    private BookCopyMapper bookCopyMapper;
     @PostMapping
     public ResponseEntity<?> addBookCopy(@RequestBody BookCopyRequestDTO request) {
         UUID bookId = request.getBookId();
@@ -71,11 +75,25 @@ public class BookCopyController {
         return ResponseEntity.ok(bookCopyService.getAllBookCopy());
     }
 
-//    @PostMapping
-//    public ResponseEntity<BookCopy> addBookCopy(@RequestBody BookCopy bookCopy) {
-//        BookCopy savedBookCopy = bookCopyService.addBookCopy(bookCopy);
-//        return ResponseEntity.ok(savedBookCopy);
-//    }
+    @GetMapping("/{bookCopyId}")
+    public ResponseEntity<BookCopyDTO> getBookCopyById(@PathVariable UUID bookCopyId) {
+        BookCopyDTO bookCopy = bookCopyMapper.mapToDto(bookCopyService.getBookCopyById(bookCopyId));
+        return ResponseEntity.ok(bookCopy);
+    }
+
+    @PutMapping("/{bookCopyId}")
+    public ResponseEntity<?> updateBookCopy(@PathVariable UUID bookCopyId, @RequestBody BookCopyUpdateDTO bookCopyDTO) {
+        try {
+            BookCopy existingBookCopy = bookCopyService.getBookCopyById(bookCopyId);
+            existingBookCopy.setLocation(bookCopyDTO.getLocation());
+            existingBookCopy.setStatus(bookCopyDTO.getStatus());
+            BookCopy updatedBookCopy = bookCopyService.addBookCopy(existingBookCopy);
+            return ResponseEntity.ok(bookCopyMapper.mapToDto(updatedBookCopy));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @GetMapping("/latest-copy-code")
     public ResponseEntity<String> getLatestCopyCode() {
@@ -96,5 +114,49 @@ public class BookCopyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to fetch available copy"));
         }
+    }
+
+    @GetMapping("/by-book/{bookId}")
+    public ResponseEntity<?> getBookCopiesByBookId(@PathVariable UUID bookId) {
+        return ResponseEntity.ok(bookCopyService.findByBookId(bookId));
+    }
+
+    @GetMapping("/by-status/{status}")
+    public ResponseEntity<?> getBookCopiesByStatus(@PathVariable Status status) {
+        return ResponseEntity.ok(bookCopyService.findByStatus(status));
+    }
+
+    @DeleteMapping("/{bookCopyId}")
+    public ResponseEntity<?> deleteBookCopyById(@PathVariable UUID bookCopyId) {
+        try {
+            bookCopyService.deleteBookCopyById(bookCopyId);
+            return ResponseEntity.ok(Map.of("message", "Book copy deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+    // API tổng số sách trong kho
+    @GetMapping("/statistics/total")
+    public ResponseEntity<Long> getTotalBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalBooks());
+    }
+
+    // API tổng số sách đang mượn
+    @GetMapping("/statistics/borrowed")
+    public ResponseEntity<Long> getTotalBorrowedBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalBorrowedBooks());
+    }
+
+    // API tổng số sách có sẵn
+    @GetMapping("/statistics/available")
+    public ResponseEntity<Long> getTotalAvailableBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalAvailableBooks());
+    }
+
+    // API tổng số sách bị mất/hư hỏng
+    @GetMapping("/statistics/lost-or-damaged")
+    public ResponseEntity<Long> getTotalLostOrDamagedBooks() {
+        return ResponseEntity.ok(bookCopyService.getTotalLostOrDamagedBooks());
     }
 }

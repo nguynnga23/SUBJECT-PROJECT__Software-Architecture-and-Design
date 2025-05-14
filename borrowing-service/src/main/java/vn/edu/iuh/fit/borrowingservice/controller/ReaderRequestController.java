@@ -1,8 +1,10 @@
 package vn.edu.iuh.fit.borrowingservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.iuh.fit.borrowingservice.dto.BorrowingStatisticsDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.PenaltyDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.UpdateStatusDTO;
@@ -10,6 +12,8 @@ import vn.edu.iuh.fit.borrowingservice.entity.ReaderRequest;
 import vn.edu.iuh.fit.borrowingservice.mapper.ReaderRequestMapper;
 import vn.edu.iuh.fit.borrowingservice.service.ReaderRequestService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +23,8 @@ import java.util.UUID;
 public class ReaderRequestController {
     @Autowired
     private ReaderRequestService readerRequestService;
-    private ReaderRequestMapper mapper = new ReaderRequestMapper();
+    @Autowired
+    private ReaderRequestMapper mapper;
     @PostMapping
     public ResponseEntity<ReaderRequestDTO> createRequest(@RequestBody ReaderRequestDTO requestDTO) {
         // Chuyển DTO thành Entity
@@ -32,8 +37,16 @@ public class ReaderRequestController {
         return ResponseEntity.ok(responseDTO);
     }
 
-
-
+    @GetMapping
+    public ResponseEntity<List<ReaderRequestDTO>> getReaderRequests() {
+        List<ReaderRequest> readerRequests = readerRequestService.getListBorrowRequest();
+        List<ReaderRequestDTO> readerRequestDTOs = new ArrayList<>();
+        for(ReaderRequest readerRequest : readerRequests) {
+            ReaderRequestDTO readerRequestDTO = mapper.mapToDTO(readerRequest);
+            readerRequestDTOs.add(readerRequestDTO);
+        }
+        return ResponseEntity.ok(readerRequestDTOs);
+    }
     @PutMapping("/{requestId}/status")
     public ResponseEntity<ReaderRequestDTO> updateStatus(@PathVariable UUID requestId, @RequestBody UpdateStatusDTO statusDTO) {
         // Chuyển DTO thành Entity
@@ -45,7 +58,17 @@ public class ReaderRequestController {
         // Trả về DTO đã map
         return ResponseEntity.ok(responseDTO);
     }
+    @PutMapping("/{requestId}/canceled")
+    public ResponseEntity<ReaderRequestDTO> updateStatus(@PathVariable UUID requestId) {
+        // Chuyển DTO thành Entity
+        ReaderRequest requestEntity = readerRequestService.cancelBorrowRequest(requestId);
 
+        // Map từ Entity sang DTO
+        ReaderRequestDTO responseDTO = mapper.mapToDTO(requestEntity);
+
+        // Trả về DTO đã map
+        return ResponseEntity.ok(responseDTO);
+    }
     @PutMapping("/{requestId}/borrow")
     public ResponseEntity<ReaderRequestDTO> updateBorrowDate(@PathVariable UUID requestId) {
         // Chuyển DTO thành Entity
@@ -92,5 +115,12 @@ public class ReaderRequestController {
         }
         return ResponseEntity.ok(readerRequestDTOs);
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<BorrowingStatisticsDTO> getStatistics() {
+        BorrowingStatisticsDTO statistics = readerRequestService.getBorrowingStatistics();
+        return ResponseEntity.ok(statistics);
+    }
+
 
 }
