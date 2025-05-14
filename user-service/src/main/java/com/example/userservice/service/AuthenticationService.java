@@ -7,8 +7,10 @@ import com.example.userservice.dto.RefreshTokenResponseDto;
 import com.example.userservice.entity.User;
 import com.example.userservice.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,7 +27,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-
+    @Autowired
+    private HttpServletRequest request;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -126,10 +129,15 @@ public ResponseEntity<?> authenticate(final AuthenticationRequestDto request , H
         // Trả về response chứa access token mới và refresh token cũ
         return new RefreshTokenResponseDto(newAccessToken, refreshToken);
     }
-    public ResponseEntity<?> changePassword(UUID userId, String oldPassword, String newPassword) {
+    public ResponseEntity<?> changePassword(String oldPassword, String newPassword) {
 //        User user = userRepository.findById(userId)
 //                .orElseThrow(() -> new RuntimeException("User not found"));
-        Optional<User> optionalUser = userRepository.findById(userId);
+        String userId = request.getHeader("X-User-Id");
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("Missing User ID in request header.");
+        }
+
+        Optional<User> optionalUser = userRepository.findById(UUID.fromString(userId));
         if (optionalUser.isEmpty()) {
             return ResponseEntity.ok(Map.of("error", "User not found."));
         }

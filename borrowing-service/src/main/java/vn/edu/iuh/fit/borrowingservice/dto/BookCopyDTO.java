@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class BookCopyDTO {
     private UUID id;
-    private UUID bookId;
+    private BookDTO book;
     private String copyCode;
     private String location;
     private String status; // "AVAILABLE", "BORROWED", etc.
@@ -18,12 +18,12 @@ public class BookCopyDTO {
         this.id = id;
     }
 
-    public UUID getBookId() {
-        return bookId;
+    public BookDTO getBook() {
+        return book;
     }
 
-    public void setBookId(UUID bookId) {
-        this.bookId = bookId;
+    public void setBook(BookDTO book) {
+        this.book = book;
     }
 
     public String getCopyCode() {

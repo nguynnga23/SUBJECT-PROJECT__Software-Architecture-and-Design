@@ -15,4 +15,24 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
     @Query("SELECT bc.copyCode FROM BookCopy bc WHERE bc.copyCode LIKE 'BC_%' ORDER BY bc.copyCode DESC LIMIT 1")
     String findLatestCopyCode();
     BookCopy findFirstByBookIdAndStatus(UUID bookId, Status status);
+    List<BookCopy> findByBookIdAndStatus(UUID bookId, Status status);
+    List<BookCopy> findByStatus(Status status);
+
+    // Tổng số sách trong kho
+    @Query("SELECT COUNT(bc) FROM BookCopy bc")
+    Long countTotalBooks();
+
+    // Tổng số sách đang được mượn
+    @Query("SELECT COUNT(bc) FROM BookCopy bc WHERE bc.status = 'BORROWED'")
+    Long countBorrowedBooks();
+
+    // Tổng số sách có sẵn
+    @Query("SELECT COUNT(bc) FROM BookCopy bc WHERE bc.status = 'AVAILABLE'")
+    Long countAvailableBooks();
+
+    // Tổng số sách bị mất/hư hỏng
+    @Query("SELECT COUNT(bc) FROM BookCopy bc WHERE bc.status IN ('LOST', 'DAMAGED')")
+    Long countLostOrDamagedBooks();
+
+
 }

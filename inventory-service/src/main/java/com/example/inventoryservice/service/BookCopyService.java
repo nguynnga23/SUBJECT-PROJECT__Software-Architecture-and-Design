@@ -13,5 +13,11 @@ public interface BookCopyService {
     String findLatestCopyCode();
     BookCopy findFirstByBookIdAndStatus(UUID bookId, Status status);
     void updateBookCopyStatus(UUID bookCopyId, Status status);
-
+    List<BookCopy> findByBookId(UUID bookId);
+    List<BookCopy> findByStatus(Status status);
+    void deleteBookCopyById(UUID bookCopyId);
+    Long getTotalBooks();
+    Long getTotalBorrowedBooks();
+    Long getTotalAvailableBooks();
+    Long getTotalLostOrDamagedBooks();
 }

@@ -48,5 +48,41 @@ public class BookCopyServiceImpl implements BookCopyService {
         bookCopyRepository.save(bookCopy);
     }
 
+    @Override
+    public List<BookCopy> findByBookId(UUID bookId) {
+        return bookCopyRepository.findByBookId(bookId);
+    }
+
+    @Override
+    public List<BookCopy> findByStatus(Status status) {
+        return bookCopyRepository.findByStatus(status);
+    }
+
+    @Override
+    public void deleteBookCopyById(UUID bookCopyId) {
+        if (!bookCopyRepository.existsById(bookCopyId)) {
+            throw new EntityNotFoundException("BookCopy with ID " + bookCopyId + " not found.");
+        }
+        bookCopyRepository.deleteById(bookCopyId);
+    }
+    // Tổng số sách trong kho
+    public Long getTotalBooks() {
+        return bookCopyRepository.countTotalBooks();
+    }
+
+    // Tổng số sách đang mượn
+    public Long getTotalBorrowedBooks() {
+        return bookCopyRepository.countBorrowedBooks();
+    }
+
+    // Tổng số sách có sẵn
+    public Long getTotalAvailableBooks() {
+        return bookCopyRepository.countAvailableBooks();
+    }
+
+    // Tổng số sách bị mất/hư hỏng
+    public Long getTotalLostOrDamagedBooks() {
+        return bookCopyRepository.countLostOrDamagedBooks();
+    }
 
 }
