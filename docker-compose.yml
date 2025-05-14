@@ -13,6 +13,16 @@ services:
     networks:
       - backend
     restart: always
+  config-service:
+    build:
+      context: ./config-service
+    image: config-service:latest
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - backend
+
 
   user-service:
     build:
@@ -25,7 +35,8 @@ services:
       - backend
     depends_on:
       - postgres
-      - redis
+      - config-service
+      - discovery-service
 
   book-service:
     build:
@@ -38,6 +49,8 @@ services:
       - backend
     depends_on:
       - postgres
+      - config-service
+      - discovery-service
 
   borrowing-service:
     build:
@@ -51,6 +64,8 @@ services:
     depends_on:
       - postgres
       - kafka
+      - config-service
+      - discovery-service
 
   inventory-service:
     build:
@@ -64,6 +79,8 @@ services:
     depends_on:
       - postgres
       - kafka
+      - config-service
+      - discovery-service
 
   notification-service:
     build:
@@ -76,6 +93,9 @@ services:
       - backend
     depends_on:
       - postgres
+      - config-service
+      - discovery-service
+      - kafka
   discovery-service:
     build:
       context: ./discovery-service
@@ -87,10 +107,11 @@ services:
       - backend
     depends_on:
       - postgres
+      - config-service
 
   recommendation-service:
     build:
-    context: ./recommendation-service
+      context: ./recommendation-service
     image: recommendation-service:latest
     container_name: recommendation-service
     ports:
@@ -99,6 +120,8 @@ services:
      - backend
     depends_on:
      - postgres
+     - config-service
+     - discovery-service
 
   gateway-service:
     build:
@@ -110,12 +133,9 @@ services:
     networks:
       - backend
     depends_on:
-      - user-service
-      - book-service
-      - inventory-service
-      - borrowing-service
-      - notification-service
-      - recommendation-service
+      - config-service
+      - discovery-service
+
   pgadmin:
       image: dpage/pgadmin4:latest
       container_name: pgadmin4-container
@@ -139,6 +159,7 @@ services:
     volumes:
       - redis_data:/data
     restart: always
+
   mongodb:
     image: mongo:6.0
     restart: always
