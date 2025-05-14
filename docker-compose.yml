@@ -65,17 +65,17 @@ services:
       - postgres
       - kafka
 
-  #  notification-service:
-#    build:
-#      context: ./inotification-service
-#    image: notification-service:latest
-#    container_name: notification-service
-#    ports:
-#      - "8085:8085"
-#    networks:
-#      - backend
-#    depends_on:
-#      - postgres
+  notification-service:
+    build:
+      context: ./notification-service
+    image: notification-service:latest
+    container_name: notification-service
+    ports:
+      - "8085:8085"
+    networks:
+      - backend
+    depends_on:
+      - postgres
   discovery-service:
     build:
       context: ./discovery-service
@@ -88,17 +88,17 @@ services:
     depends_on:
       - postgres
 
-  # recommendation-service:
-#    build:
-#      context: ./recommendation-service
-#    image: recommendation-service:latest
-  #   container_name: recommendation-service
-  #   ports:
-  #     - "8086:8086"
-  #   networks:
-  #     - backend
-  #   depends_on:
-  #     - postgres
+  recommendation-service:
+    build:
+    context: ./recommendation-service
+    image: recommendation-service:latest
+    container_name: recommendation-service
+    ports:
+     - "8086:8086"
+    networks:
+     - backend
+    depends_on:
+     - postgres
 
   gateway-service:
     build:
@@ -114,8 +114,8 @@ services:
       - book-service
       - inventory-service
       - borrowing-service
-#      - notification-service
-#      - recommendation-service
+      - notification-service
+      - recommendation-service
   pgadmin:
       image: dpage/pgadmin4:latest
       container_name: pgadmin4-container
