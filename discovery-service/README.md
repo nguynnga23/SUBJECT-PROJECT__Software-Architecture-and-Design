@@ -48,7 +48,7 @@ server.port=8761
 
 eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=false
-eureka.instance.hostname=localhost
+eureka.instance.hostname=discovery-service
 ```
 - **Port**: `8761` (có thể thay đổi nếu cần).
 - **Eureka Client**: Được tắt để tránh tự đăng ký.

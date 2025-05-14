@@ -21,10 +21,64 @@ Trước khi chạy project, hãy đảm bảo hệ thống của bạn có:
 - **Docker (tuỳ chọn)**
 - **Postman hoặc Curl để test API**
 
----
 ## 3. Cách chạy các service
+### 3.1. Chạy project với Docker Compose
 
-### 3.1. Chạy Discovery Service (Eureka Server)
+#### Cài đặt Docker Compose
+Đảm bảo bạn đã cài đặt Docker và Docker Compose trên hệ thống của mình.
+
+#### Chạy các service
+Chạy lệnh sau trong thư mục gốc của dự án:
+```bash
+docker-compose up --build
+```
+
+#### Kiểm tra các container
+Sau khi chạy, kiểm tra các container đang hoạt động:
+```bash
+docker ps
+```
+
+#### Dừng các container
+Để dừng các container, sử dụng lệnh:
+```bash
+docker-compose down
+```
+
+#### Truy cập các service
+- **Eureka Server**: [http://localhost:8761](http://localhost:8761)
+- **API Gateway**: [http://localhost:8080](http://localhost:8080)
+- **User Service**: [http://localhost:8081](http://localhost:8081)
+- **Book Service**: [http://localhost:8082](http://localhost:8082)
+- **Borrowing Service**: [http://localhost:8083](http://localhost:8083)
+- **Inventory Service**: [http://localhost:8084](http://localhost:8084)
+- **PgAdmin**: [http://localhost:80](http://localhost:80)
+- **Mongo Express**: [http://localhost:9090](http://localhost:9090)
+
+#### Ghi chú
+| Lệnh                              | Đặc điểm                                                                 |
+| --------------------------------- | ------------------------------------------------------------------------ |
+| `docker-compose up`               | Chỉ khởi động container, không build lại image nếu đã có sẵn.            |
+| `docker-compose build`            | Chỉ build image, không khởi động container.                              |
+| `docker-compose up --build`       | Build lại image (nếu cần) và khởi động container.                        |
+| `docker-compose build --no-cache` | Build lại image **mà không dùng cache**, đảm bảo tất cả các lớp đều mới. |
+
+- Đảm bảo các biến môi trường trong file `.env` được cấu hình đúng.
+- Nếu gặp lỗi, kiểm tra log bằng lệnh:
+```bash
+docker-compose logs -f
+```
+
+#### Rebuild Docker images without cache
+Nếu bạn muốn xây dựng lại toàn bộ các image Docker mà không sử dụng cache, hãy chạy lệnh sau:
+```bash
+docker-compose build --no-cache
+```
+Sau đó, khởi động lại các container:
+```bash
+docker-compose up -d
+```
+### 3.2. Chạy Discovery Service (Eureka Server)
 ```bash
 cd discovery-service
 ./gradlew bootRun
@@ -32,14 +86,14 @@ cd discovery-service
 - Eureka Server sẽ chạy trên **http://localhost:8761**
 - Kiểm tra trên trình duyệt để đảm bảo service đã khởi động.
 
-### 3.2. Chạy Gateway Service (API Gateway)
+### 3.3. Chạy Gateway Service (API Gateway)
 ```bash
 cd gateway-service
 ./gradlew bootRun
 ```
 - Gateway Service sẽ chạy trên **http://localhost:8080**
 
-### 3.3. Chạy các Service khác
+### 3.4. Chạy các Service khác
 Chạy các service còn lại theo cú pháp:
 ```bash
 cd user-service  # hoặc book-service, borrowing-service, inventory-service, notification-service
@@ -120,4 +174,7 @@ tail -f logs/app.log
 ---
 ## 7. Đóng góp
 Nếu bạn gặp lỗi hoặc muốn đóng góp cải tiến, hãy tạo Pull Request hoặc mở Issue trên repository của nhóm.
+
+---
+
 
