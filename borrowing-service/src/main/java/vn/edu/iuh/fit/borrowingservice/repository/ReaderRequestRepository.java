@@ -28,9 +28,37 @@ public interface ReaderRequestRepository extends JpaRepository<ReaderRequest, UU
     @Query("SELECT COUNT(r) FROM ReaderRequest r WHERE r.status = 'APPROVED'")
     Long countApprovedRequests();
 
+    // Phiếu mượn đã phê duyệt
+    @Query("SELECT COUNT(r) FROM ReaderRequest r WHERE r.status = 'BORROWED'")
+    Long countBorrowedRequests();
+
+    // Phiếu mượn đã phê duyệt
+    @Query("SELECT COUNT(r) FROM ReaderRequest r WHERE r.status = 'RETURNED'")
+    Long countReturnedRequests();
+
     // Phiếu mượn quá hạn
     @Query("SELECT COUNT(r) FROM ReaderRequest r WHERE r.status = 'OVERDUE'")
     Long countOverdueRequests();
 
+    // Thống kê số phiếu mượn theo ngày
+    @Query("SELECT COUNT(r) FROM ReaderRequest r WHERE DATE(r.createdAt) = :date")
+    Long countRequestsByDate(@Param("date") LocalDate date);
 
+    // Thống kê số sách mượn trong ngày
+    @Query("SELECT COUNT(d) FROM ReaderRequest r JOIN r.readerRequestDetails d WHERE DATE(r.createdAt) = :date")
+    Long countBooksBorrowedByDate(@Param("date") LocalDate date);
+
+    // Top 10 sách được mượn nhiều nhất
+//    @Query("SELECT d.bookCopyId, COUNT(d.bookCopyId) as borrowCount " +
+//           "FROM ReaderRequest r JOIN r.readerRequestDetails d " +
+//           "GROUP BY d.bookCopyId " +
+//           "ORDER BY borrowCount DESC")
+//    List<Object[]> findTop10BooksBorrowed(org.springframework.data.domain.Pageable pageable);
+
+    // Top 10 thể loại sách được mượn nhiều nhất (giả sử ReaderRequestDetail có trường genre hoặc join với Book entity)
+//    @Query("SELECT b.genre, COUNT(b.genre) as genreCount " +
+//           "FROM ReaderRequest r JOIN r.readerRequestDetails d JOIN BookCopy bc ON d.bookCopyId = bc.id JOIN Book b ON bc.bookId = b.id " +
+//           "GROUP BY b.genre " +
+//           "ORDER BY genreCount DESC")
+//    List<Object[]> findTop10GenresBorrowed(org.springframework.data.domain.Pageable pageable);
 }
