@@ -2,8 +2,10 @@ package vn.edu.iuh.fit.borrowingservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import vn.edu.iuh.fit.borrowingservice.dto.BorrowingStatisticsDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.PenaltyDTO;
 import vn.edu.iuh.fit.borrowingservice.dto.ReaderRequestDTO;
@@ -122,5 +124,24 @@ public class ReaderRequestController {
         return ResponseEntity.ok(statistics);
     }
 
+    @GetMapping("/statistics/{date}")
+    public ResponseEntity<Long> getStatisticsByDate(@PathVariable LocalDate date) {
+        return ResponseEntity.ok(readerRequestService.countRequestsByDate(date));
+    }
 
+    @GetMapping("/statistics/book-borrowed/{date}")
+    public ResponseEntity<Long> getStatisticsBookBorrowedByDate(@PathVariable LocalDate date) {
+        return ResponseEntity.ok(readerRequestService.countBookByDate(date));
+    }
+
+    // Xử lý ngoại lệ sai định dạng ngày
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleInvalidDateFormat(MethodArgumentTypeMismatchException ex) {
+        if (ex.getRequiredType() == LocalDate.class) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Định dạng ngày không hợp lệ. Vui lòng sử dụng định dạng: YYYY-MM-DD (vd: 2025-05-15).");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Yêu cầu không hợp lệ.");
+    }
 }

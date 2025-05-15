@@ -206,7 +206,17 @@ public class ReaderRequestService {
         statisticsDTO.setCanceledRequests(readerRequestRepository.countCanceledRequests());
         statisticsDTO.setPendingRequests(readerRequestRepository.countPendingRequests());
         statisticsDTO.setApprovedRequests(readerRequestRepository.countApprovedRequests());
+        statisticsDTO.setBorrowedRequests(readerRequestRepository.countBorrowedRequests());
+        statisticsDTO.setReturnedRequests(readerRequestRepository.countReturnedRequests());
         statisticsDTO.setOverdueRequests(readerRequestRepository.countOverdueRequests());
         return statisticsDTO;
+    }
+
+    public Long countRequestsByDate(LocalDate date) {
+        return readerRequestRepository.countRequestsByDate(date);
+    }
+
+    public Long countBookByDate(LocalDate date) {
+        return readerRequestRepository.countBooksBorrowedByDate(date);
     }
 }
