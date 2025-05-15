@@ -17,12 +17,17 @@ RUN ./gradlew clean build -x test
 FROM openjdk:21-jdk-slim
 
 WORKDIR /app
+# Cài dockerize
+ENV DOCKERIZE_VERSION v0.7.0
+RUN apt-get update && apt-get install -y curl && \
+    curl -L https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
+    | tar -C /usr/local/bin -xz && \
+    apt-get remove -y curl && apt-get autoremove -y && apt-get clean
 
 COPY --from=builder /app/build/libs/gateway-service-*-SNAPSHOT.jar app.jar
-
 # Sao chép thư mục resources vào image
 COPY --from=builder /app/src/main/resources /app/resources
+ENTRYPOINT ["dockerize", "-wait", "tcp://config-service:8888","-wait", "tcp://discovery-service:8761", "-timeout", "60s", "java", "-jar", "app.jar"]
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
 
 

@@ -105,9 +105,11 @@ services:
       depends_on:
         - config-service
         - postgres
-      # Ensure that discovery-service waits for config-service to be healthy before starting
-#      entrypoint: [ "./wait-for-it.sh", "config-service:8888", "--", "java", "-jar", "discovery-service.jar" ]
-
+      environment:
+        - SPRING_APPLICATION_NAME=discovery-service
+        - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+        - SPRING_CLOUD_CONFIG_PROFILE=default
+        - SPRING_CLOUD_CONFIG_LABEL=main
   gateway-service:
     build:
       context: ./gateway-service
