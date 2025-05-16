@@ -24,6 +24,15 @@ public class BookController {
     @Autowired
     private CategoryService categoryService;
 
+    private static int retryCount = 0;
+
+    @GetMapping("/retry-test")
+    public ResponseEntity<String> retryTest() {
+        retryCount++;
+        System.out.println("Retry test - attempt #" + retryCount);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error - Retry Test attempt #" + retryCount);
+    }
+
     @PostMapping
     public ResponseEntity<?> addBook(@RequestBody BookRequestDTO request) {
         if (bookService.existsByBookCode(request.bookCode())) {
