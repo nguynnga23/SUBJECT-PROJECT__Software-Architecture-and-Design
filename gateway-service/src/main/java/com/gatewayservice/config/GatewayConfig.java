@@ -27,7 +27,7 @@ public class GatewayConfig {
                                 .retry(config -> config
                                         .setRetries(3)
                                         .setStatuses(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.BAD_GATEWAY, HttpStatus.SERVICE_UNAVAILABLE)
-                                        .setBackoff(Duration.ofSeconds(3), Duration.ofSeconds(5), (int) 2.0, false)
+                                        .setBackoff(Duration.ofSeconds(3), Duration.ofSeconds(5), 2, false)
                                 )
                                 .requestRateLimiter(c -> c
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
