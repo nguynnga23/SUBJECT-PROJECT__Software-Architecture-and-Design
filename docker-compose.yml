@@ -87,7 +87,17 @@ services:
       - zookeeper
     networks:
       - backend
-
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    ports:
+      - "9093:8080" # Mapped port 9091 on host to 8080 on container
+      - "50000:50000" # Mapped port 50000 for Jenkins agent communication
+    volumes:
+      - jenkins_data:/var/jenkins_home # Mount a volume for Jenkins data persistence
+    networks:
+      - backend
   config-service:
     build:
       context: ./config-service
@@ -232,3 +242,4 @@ volumes:
   postgres_data:
   redis_data:
   mongo-data:
+  jenkins_data:
