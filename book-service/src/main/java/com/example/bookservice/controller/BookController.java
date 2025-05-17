@@ -24,13 +24,13 @@ public class BookController {
     @Autowired
     private CategoryService categoryService;
 
-    private static int retryCount = 0;
+    private static final AtomicInteger retryCount = new AtomicInteger(0);
 
     @GetMapping("/retry-test")
     public ResponseEntity<String> retryTest() {
-        retryCount++;
-        System.out.println("Retry test - attempt #" + retryCount);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error - Retry Test attempt #" + retryCount);
+        int currentRetryCount = retryCount.incrementAndGet();
+        System.out.println("Retry test - attempt #" + currentRetryCount);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error - Retry Test attempt #" + currentRetryCount);
     }
 
     @PostMapping
