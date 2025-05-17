@@ -29,8 +29,8 @@ ext {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	// https://mvnrepository.com/artifact/org.tensorflow/tensorflow
-	implementation("org.tensorflow:tensorflow:1.15.0")
+	// https://mvnrepository.com/artifact/org.tensorflow/tensorflow-core-platform
+	implementation("org.tensorflow:tensorflow-core-platform:1.0.0")
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui

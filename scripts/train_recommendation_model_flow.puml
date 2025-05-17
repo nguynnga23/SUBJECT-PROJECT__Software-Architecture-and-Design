@@ -1,0 +1,23 @@
+```mermaid
+flowchart TD
+    A[Start] --> B[Load and preprocess data]
+    B -->|Data loaded successfully?| C[Create user-item interaction matrix]
+    C --> D[Add negative samples]
+    D -->|Sufficient interactions?| E[Return interactions, user count, book count, mappings]
+    D -->|No| F[Raise ValueError] --> G[Stop]
+    B -->|No| F
+
+    E --> H[Build neural collaborative filtering model]
+    H --> I[Prepare training data]
+    I -->|Data shapes consistent?| J[Split data into train and test sets]
+    J --> K[Train the model]
+    K --> L[Export model and mappings]
+    I -->|No| F
+
+    L --> M[Test recommendations]
+    M -->|Model loaded successfully?| N[Generate predictions for a user]
+    N --> O[Return top-k recommendations]
+    M -->|No| F
+
+    O --> P[Stop]
+    G --> P
