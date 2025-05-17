@@ -21,25 +21,20 @@ public class NotificationConsumer {
             topics = "${spring.kafka.topic.borrowing-notification}",
             groupId = "${spring.kafka.consumer.group-id}"
     )
+
     public void consumeMessage(String message) {
-        System.out.println("Received message1: " + message);
-        String readerId = extractReaderId(message);
-        if (readerId != null) {
-            String userEmail = fetchUserEmail(readerId);
-            if (userEmail != null) {
-                sendEmail(userEmail, "Borrow Request Confirmation", "Your borrow request has been created successfully.");
-                System.out.println("Sent email successfully to: " + userEmail);
-            } else {
-                System.out.println("Failed to fetch email for readerId: " + readerId);
-            }
+        System.out.println("Received message: " + message);
+        String email = extractEmail(message);
+        if (email != null) {
+                sendEmail(email, "Borrow Request Confirmation", "Your borrow request has been created successfully.");
+                System.out.println("Sent email successfully to: " + email);
         } else {
-            System.out.println("Failed to extract readerId from message.");
+            System.out.println("Failed to extract reader's email from message.");
         }
     }
-
-    private String extractReaderId(String message) {
+    private String extractEmail(String message) {
         try {
-            String prefix = "readerId: ";
+            String prefix = "email: ";
             int index = message.indexOf(prefix);
             if (index != -1) {
                 return message.substring(index + prefix.length()).trim();
@@ -48,12 +43,6 @@ public class NotificationConsumer {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private String fetchUserEmail(String readerId) {
-        // Mocked email fetching logic
-        // Replace this with actual logic to fetch email from a database or service
-        return "nguyennga200x@gmail.com";
     }
 
     private void sendEmail(String to, String subject, String text) {

@@ -98,7 +98,8 @@ public class ReaderRequestService {
             ReaderRequest savedRequest = readerRequestRepository.save(readerRequest);
 
             // Gửi sự kiện đến Notification Service
-            String notificationMessage = "Borrow request created successfully for readerId: " + readerId;
+            UserDTO reader = userServiceClient.getUserProfile(UUID.fromString(readerId));
+            String notificationMessage = "Borrow request created successfully for email: " + reader.getEmail();
             producer.sendToNotificationService(notificationMessage);
 
             // Gửi sự kiện đến Inventory Service
