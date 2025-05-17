@@ -96,6 +96,8 @@ services:
       - "50000:50000" # Mapped port 50000 for Jenkins agent communication
     volumes:
       - jenkins_data:/var/jenkins_home # Mount a volume for Jenkins data persistence
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /snap/bin/docker:/usr/bin/docker
     networks:
       - backend
   config-service:
