@@ -9,6 +9,7 @@ import com.example.inventoryservice.enums.Status;
 import com.example.inventoryservice.mapper.BookCopyMapper;
 import com.example.inventoryservice.service.BookCopyService;
 import com.example.inventoryservice.service.InventoryService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,23 +37,21 @@ public class BookCopyController {
         Inventory inventory = inventoryService.getInventoryByBookId(bookId);
 
         if (inventory == null) {
-            Inventory newInventory = new Inventory();
-            newInventory.setAvailable(quantity);
-            newInventory.setTotalQuantity(quantity);
-            newInventory.setLost(0);
-            newInventory.setDamaged(0);
-            newInventory.setBorrowed(0);
-            newInventory.setBookId(bookId);
-            inventory = inventoryService.saveInventory(newInventory);
+            inventory = new Inventory();
+            inventory.setBookId(bookId);
+            inventory.setTotalQuantity(0); // Ban đầu là 0, sẽ được cập nhật sau
+            inventory = inventoryService.saveInventory(inventory);
         }
 
         for (int i = 0; i < quantity; i++) {
             BookCopy bookCopy = new BookCopy();
             String latestCode = bookCopyService.findLatestCopyCode();
             int nextNumber = 1;
+
             if (latestCode != null && latestCode.startsWith("BC_")) {
                 nextNumber = Integer.parseInt(latestCode.substring(3)) + 1;
             }
+
             String formattedCode = String.format("BC_%03d", nextNumber);
             bookCopy.setCopyCode(formattedCode);
             bookCopy.setBookId(bookId);
@@ -60,15 +59,15 @@ public class BookCopyController {
             bookCopy.setStatus(Status.AVAILABLE);
             bookCopy.setInventory(inventory);
             bookCopyService.addBookCopy(bookCopy);
-
-            inventory.setTotalQuantity(inventory.getTotalQuantity() + 1);
-            inventory.setAvailable(inventory.getAvailable() + 1);
         }
 
+        // Cập nhật tổng số lượng
+        inventory.setTotalQuantity(inventory.getBookCopies().size());
         inventoryService.saveInventory(inventory);
 
         return ResponseEntity.ok(Map.of("message", "Added " + quantity + " book copies successfully"));
     }
+
 
     @GetMapping
     public ResponseEntity<?> getAllBookCopies() {
@@ -84,16 +83,27 @@ public class BookCopyController {
     @PutMapping("/{bookCopyId}")
     public ResponseEntity<?> updateBookCopy(@PathVariable UUID bookCopyId, @RequestBody BookCopyUpdateDTO bookCopyDTO) {
         try {
+            // Kiểm tra và lấy BookCopy
             BookCopy existingBookCopy = bookCopyService.getBookCopyById(bookCopyId);
-            existingBookCopy.setLocation(bookCopyDTO.getLocation());
-            existingBookCopy.setStatus(bookCopyDTO.getStatus());
+            if (bookCopyDTO.getLocation() != null) {
+                existingBookCopy.setLocation(bookCopyDTO.getLocation());
+            }
+            if (bookCopyDTO.getStatus() != null) {
+                existingBookCopy.setStatus(bookCopyDTO.getStatus());
+//                inventoryService.updateActionInventory(existingBookCopy.getBookId(), bookCopyDTO.getStatus());
+            }
+            // Lưu BookCopy sau khi cập nhật
             BookCopy updatedBookCopy = bookCopyService.addBookCopy(existingBookCopy);
             return ResponseEntity.ok(bookCopyMapper.mapToDto(updatedBookCopy));
-        } catch (Exception e) {
+        } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", "BookCopy not found with ID: " + bookCopyId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update BookCopy: " + e.getMessage()));
         }
     }
+
 
     @GetMapping("/latest-copy-code")
     public ResponseEntity<String> getLatestCopyCode() {

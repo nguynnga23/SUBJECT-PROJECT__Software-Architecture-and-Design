@@ -156,7 +156,18 @@ public class ReaderRequestService {
         readerRequest.setDateReturned(LocalDateTime.now());
         readerRequest.setStatus(BorrowStatus.RETURNED);
         readerRequest.setUpdatedAt(LocalDateTime.now());
-        return readerRequestRepository.save(readerRequest);
+        // Gửi sự kiện đến Inventory Service
+        // Sau khi lưu borrow request
+        ReaderRequest savedRequest = readerRequestRepository.save(readerRequest);
+        ReaderRequestDTO dto = mapper.mapToDTO(savedRequest);
+        String inventoryMessage = null;
+        try {
+            inventoryMessage = objectMapper.writeValueAsString(dto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        producer.sendToInventoryService(inventoryMessage);
+        return savedRequest;
     }
 
     @RequireAdmin
@@ -193,11 +204,15 @@ public class ReaderRequestService {
 
         readerRequest.setStatus(BorrowStatus.CANCELED);
         readerRequest.setUpdatedAt(LocalDateTime.now());
-        readerRequestRepository.save(readerRequest);
-
-        // Optionally, send a notification or event for the cancellation
-        // String notificationMessage = "Borrow request with ID " + requestId + " has been canceled.";
-        // producer.sendToNotificationService(notificationMessage);
+        ReaderRequest savedRequest = readerRequestRepository.save(readerRequest);
+        ReaderRequestDTO dto = mapper.mapToDTO(savedRequest);
+        String inventoryMessage = null;
+        try {
+            inventoryMessage = objectMapper.writeValueAsString(dto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        producer.sendToInventoryService(inventoryMessage);
         return readerRequest;
     }
 
