@@ -10,6 +10,6 @@ import java.util.UUID;
 
 @FeignClient(name = "gateway-service", configuration = FeignConfig.class)
 public interface UserServiceClient {
-    @GetMapping("/api/v1/user-service/users/profile/{userId}")
+    @GetMapping("/api/v1/user-service/users/{userId}")
     UserDTO getUserProfile(@PathVariable("userId") UUID userId);
 }

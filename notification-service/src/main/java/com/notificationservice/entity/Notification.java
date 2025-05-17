@@ -20,11 +20,9 @@ import java.util.UUID;
 public class Notification {
     @Id
     private String id;
-
     private UUID userId;
     private String title;
     private String message;
-
     private NotificationType type;
     private boolean isRead;
     private Date createdAt;
