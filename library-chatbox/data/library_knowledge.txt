@@ -1,0 +1,25 @@
+1. Quy trình mượn sách
+Sinh viên đăng ký tài khoản với họ tên, email
+Đăng nhập để tìm sách theo tên, tác giả hoặc thể loại
+Chọn "Mượn sách" và chọn số ngày mượn (tối đa 14 ngày)
+Hệ thống gửi email xác nhận mượn sách gồm tên sách, thời hạn, hạn nhận
+Sách được giữ tối đa 3 ngày
+Sinh viên đến thư viện, trình thẻ thư viện hoặc email, gặp thủ thư để nhận sách
+2. Trả sách và gia hạn
+Trả đúng hạn để tránh bị phạt: 20000 đồng mỗi ngày mỗi quyển
+Gia hạn 1 lần, tối đa 7 ngày, nếu chưa có người mượn tiếp (thực hiện online)
+3. Phòng đọc và sử dụng tại chỗ
+Giờ mở cửa: 7 giờ đến 20 giờ từ thứ hai đến thứ bảy
+Không mang thức ăn hoặc nước uống mở nắp, giữ yên lặng
+Tài liệu tại chỗ không được mượn mang về, chỉ được photocopy tối đa 20%
+4. Máy tính và internet
+Trình thẻ để sử dụng máy tính, tối đa 2 giờ mỗi lượt
+Cấm truy cập các trang web độc hại hoặc vi phạm bản quyền
+Vi phạm sẽ bị khóa tài khoản 1 tuần
+5. An toàn và xử lý vi phạm
+Sách phải được mượn đúng quy trình, cấm viết hoặc vẽ lên tài liệu
+Làm mất hoặc làm hỏng sách phải bồi thường theo giá bìa cộng 20% phí xử lý
+Vi phạm nội quy sẽ bị chặn quyền mượn tạm thời hoặc vĩnh viễn
+6. Hỗ trợ
+ Liên hệ thư viện qua email [support@thuvien.edu.vn](mailto:support@thuvien.edu.vn) hoặc số điện thoại (028) 1234 5678
+ Thư viện phản hồi trong vòng 2 ngày làm việc

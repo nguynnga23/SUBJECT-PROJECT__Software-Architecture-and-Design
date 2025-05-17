@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/api/v1/book-service/books")
@@ -23,6 +24,15 @@ public class BookController {
     private BookService bookService;
     @Autowired
     private CategoryService categoryService;
+
+    private static final AtomicInteger retryCount = new AtomicInteger(0);
+
+    @GetMapping("/retry-test")
+    public ResponseEntity<String> retryTest() {
+        int currentRetryCount = retryCount.incrementAndGet();
+        System.out.println("Retry test - attempt #" + currentRetryCount);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error - Retry Test attempt #" + currentRetryCount);
+    }
 
     @PostMapping
     public ResponseEntity<?> addBook(@RequestBody BookRequestDTO request) {
