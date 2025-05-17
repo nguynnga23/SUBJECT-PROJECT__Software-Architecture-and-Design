@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,6 +19,12 @@ import java.util.UUID;
 public class AuthorController {
     @Autowired
     private AuthorService authorService;
+
+    @GetMapping
+    public ResponseEntity<List<Author>> getAllAuthors() {
+        List<Author> authors = authorService.getAllAuthors();
+        return ResponseEntity.ok(authors);
+    }
 
     @PostMapping
     public ResponseEntity<?> addAuthor(@RequestBody CategoryDTO category) {

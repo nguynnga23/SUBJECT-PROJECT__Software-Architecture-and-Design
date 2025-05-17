@@ -18,15 +18,31 @@ public class BookKafkaConsumer {
     public void consumeBookCreatedEvent(String message) {
         System.out.println("Received BookCreated event: " + message);
 
-        String bookId = message.split(": ")[1];
-        Inventory inventory = new Inventory();
-        inventory.setBookId(UUID.fromString(bookId));
-        inventory.setTotalQuantity(0);
-        inventory.setAvailable(0);
-        inventory.setBorrowed(0);
-        inventory.setLost(0);
-        inventory.setDamaged(0);
-        inventoryService.saveInventory(inventory);
-        System.out.println( inventoryService.saveInventory(inventory));
+        try {
+            // Kiểm tra định dạng message
+            if (!message.contains(": ")) {
+                System.err.println("Invalid message format: " + message);
+                return;
+            }
+            // Tách lấy bookId từ message
+            String bookId = message.split(": ")[1];
+            UUID parsedBookId = UUID.fromString(bookId);
+
+            // Kiểm tra xem Inventory đã tồn tại chưa
+            if (inventoryService.getInventoryByBookId(parsedBookId) != null) {
+                System.out.println("Inventory already exists for Book ID: " + parsedBookId);
+                return;
+            }
+            // Tạo Inventory mới nếu chưa tồn tại
+            Inventory inventory = new Inventory();
+            inventory.setBookId(parsedBookId);
+            inventoryService.saveInventory(inventory);
+            System.out.println("Inventory created for Book ID: " + parsedBookId);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid UUID format: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Failed to process BookCreated event: " + e.getMessage());
+        }
     }
+
 }
