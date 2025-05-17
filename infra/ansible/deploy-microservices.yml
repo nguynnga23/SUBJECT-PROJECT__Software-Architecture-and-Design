@@ -1,0 +1,37 @@
+- name: Deploy Microservices Spring Boot trên EC2
+  hosts: microservices
+  become: yes
+  tasks:
+
+    - name: Cập nhật hệ thống
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Cài Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Cài Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Khởi động Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Clone repo microservices
+      git:
+        repo: 'https://github.com/nguynnga23/SUBJECT-PROJECT__Software-Architecture-and-Design.git'
+        dest: /home/ubuntu/SUBJECT-PROJECT__Software-Architecture-and-Design
+        version: 41-devops-terraform-and-ansible-integration-for-deployment
+        accept_hostkey: yes
+
+    - name: Chạy docker-compose để khởi động service
+      command: docker-compose up -d
+      args:
+        chdir: /home/ubuntu/SUBJECT-PROJECT__Software-Architecture-and-Design

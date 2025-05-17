@@ -10,6 +10,7 @@ COPY build.gradle .
 COPY settings.gradle .
 COPY src src
 
+RUN chmod +x gradlew
 # Build thật sự
 RUN ./gradlew clean build -x test
 
