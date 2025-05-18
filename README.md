@@ -9,11 +9,9 @@ Dự án này bao gồm các service sau:
 - **Borrowing Service**
 - **Inventory Service**
 - **Notification Service**
-- **Recommendation Service**
 
 Các service này giao tiếp với nhau thông qua API Gateway.
 
----
 ## 2. Yêu cầu hệ thống
 Trước khi chạy project, hãy đảm bảo hệ thống của bạn có:
 - **JDK 17+**
@@ -98,11 +96,12 @@ Mỗi service sẽ đăng ký với **Eureka Server** và có một cổng riên
 - **Borrowing Service**: `http://localhost:8083`
 - **Inventory Service**: `http://localhost:8084`
 - **Notification Service**: `http://localhost:8085`
-- **Recommendation Service**: `http://localhost:8086`
----
-## 4. Kiểm tra API
+## 4. Kiểm tra đăng ký service trong Eureka
+Mở trình duyệt và truy cập **http://localhost:8761**, đảm bảo tất cả service đã đăng ký thành công.
 
-### 4.1. Kiểm tra API của từng Service với Swagger UI URL
+## 5. Kiểm tra API
+
+### 5.1. Kiểm tra API của từng Service với Swagger UI URL
 - **User Service**:  http://localhost:8081/swagger-ui/index.html
 - **Book Service**: http://localhost:8082/swagger-ui/index.html
 - **Borrowing Service**: http://localhost:8083/swagger-ui/index.html
@@ -110,8 +109,8 @@ Mỗi service sẽ đăng ký với **Eureka Server** và có một cổng riên
 - **Notification Service**: http://localhost:8085/swagger-ui/index.html
 - **Recommendation Service**: http://localhost:8086/swagger-ui/index.html
 
+### 5.2. Kiểm tra API qua Gateway
 
-### 4.2. Kiểm tra API qua Gateway
 API Gateway sẽ route các request đến các service tương ứng:
 ```bash
 curl -X GET http://localhost:8080/api/v1/user-service/users  # Gửi request đến User Service qua Gateway
@@ -122,18 +121,9 @@ curl -X GET http://localhost:8080/api/v1/notification-service/notifications  # G
 curl -X GET http://localhost:8080/api/v1/recommendation-service  # Gửi request đến Notification Service qua Gateway
 
 ```
----
-## 5. Kiểm tra đăng ký service trong Eureka
-Mở trình duyệt và truy cập **http://localhost:8761**, đảm bảo tất cả service đã đăng ký thành công.
-
----
 ## 6. Đóng góp
+
 Nếu bạn gặp lỗi hoặc muốn đóng góp cải tiến, hãy tạo Pull Request hoặc mở Issue trên repository của nhóm.
 
----
-
-
-
----
 
 

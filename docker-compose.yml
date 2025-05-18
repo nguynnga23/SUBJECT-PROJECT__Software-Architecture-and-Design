@@ -171,6 +171,7 @@ services:
       - postgres
       - config-service
       - discovery-service
+      - redis
 
   book-service:
     build:
