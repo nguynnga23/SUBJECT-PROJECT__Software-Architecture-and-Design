@@ -222,20 +222,6 @@ services:
       - discovery-service
       - kafka
 
-  recommendation-service:
-    build:
-      context: ./recommendation-service
-    image: recommendation-service:latest
-    container_name: recommendation-service
-    ports:
-      - "8086:8086"
-    networks:
-      - backend
-    depends_on:
-      - postgres
-      - config-service
-      - discovery-service
-
 networks:
   backend:
     driver: bridge
