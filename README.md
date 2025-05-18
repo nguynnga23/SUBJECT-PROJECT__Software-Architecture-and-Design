@@ -21,7 +21,37 @@ Trước khi chạy project, hãy đảm bảo hệ thống của bạn có:
 - **Docker (tuỳ chọn)**
 - **Postman hoặc Curl để test API**
 
-## 3. Cách chạy các service
+### Hướng dẫn tạo file `.env` từ `.env.example`
+1. Trong thư mục gốc dự án, sao chép file `.env.example` thành `.env`:
+    ```bash
+    cp .env.example .env
+    ```
+2. Mở file `.env` vừa tạo và điền các thông tin cấu hình phù hợp với môi trường của bạn (database, email, ...).
+
+### Hướng dẫn tạo Email và Password cho Spring Email
+
+Để sử dụng chức năng gửi email trong Spring (ví dụ cho Notification Service), bạn cần có tài khoản email và mật khẩu ứng dụng (App Password):
+
+### Bước 1: Tạo tài khoản Gmail (nếu chưa có)
+- Đăng ký tại https://mail.google.com/
+
+### Bước 2: Bật xác minh 2 bước cho Gmail
+- Truy cập https://myaccount.google.com/security
+- Bật xác minh 2 bước (2-Step Verification).
+
+### Bước 3: Tạo App Password (Mật khẩu ứng dụng)
+- Sau khi bật xác minh 2 bước, vào mục "App passwords" (Mật khẩu ứng dụng).
+- Chọn "Mail" cho ứng dụng và "Other" (hoặc chọn thiết bị tuỳ ý).
+- Google sẽ tạo cho bạn một mật khẩu ứng dụng gồm 16 ký tự.
+
+### Bước 4: Thêm thông tin vào file `.env`
+Thêm các dòng sau vào file `.env` ở thư mục gốc dự án:
+```
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+```
+**Lưu ý:** Không chia sẻ mật khẩu ứng dụng công khai và tuyệt đối không Commit và Push lên Repo Github.
+## 3. Cách chạy các service sử dụng Docker
 ### 3.1. Chạy project với Docker Compose
 
 #### Cài đặt Docker Compose
@@ -30,7 +60,10 @@ Trước khi chạy project, hãy đảm bảo hệ thống của bạn có:
 #### Chạy các service
 Chạy lệnh sau trong thư mục gốc của dự án:
 ```bash
-docker-compose up --build
+docker-compose build --no-cache
+```
+```bash
+docker-compose up -d
 ```
 
 #### Kiểm tra các container
@@ -44,16 +77,6 @@ docker ps
 ```bash
 docker-compose down
 ```
-
-#### Truy cập các service
-- **Eureka Server**: [http://localhost:8761](http://localhost:8761)
-- **API Gateway**: [http://localhost:8080](http://localhost:8080)
-- **User Service**: [http://localhost:8081](http://localhost:8081)
-- **Book Service**: [http://localhost:8082](http://localhost:8082)
-- **Borrowing Service**: [http://localhost:8083](http://localhost:8083)
-- **Inventory Service**: [http://localhost:8084](http://localhost:8084)
-- **PgAdmin**: [http://localhost:80](http://localhost:80)
-- **Mongo Express**: [http://localhost:9090](http://localhost:9090)
 
 #### Ghi chú
 | Lệnh                              | Đặc điểm                                                                 |
@@ -69,36 +92,6 @@ docker-compose down
 docker-compose logs -f
 ```
 
-#### Rebuild Docker images without cache
-Nếu bạn muốn xây dựng lại toàn bộ các image Docker mà không sử dụng cache, hãy chạy lệnh sau:
-```bash
-docker-compose build --no-cache
-```
-Sau đó, khởi động lại các container:
-```bash
-docker-compose up -d
-```
-### 3.2. Chạy Discovery Service (Eureka Server)
-```bash
-cd discovery-service
-./gradlew bootRun
-```
-- Eureka Server sẽ chạy trên **http://localhost:8761**
-- Kiểm tra trên trình duyệt để đảm bảo service đã khởi động.
-
-### 3.3. Chạy Gateway Service (API Gateway)
-```bash
-cd gateway-service
-./gradlew bootRun
-```
-- Gateway Service sẽ chạy trên **http://localhost:8080**
-
-### 3.4. Chạy các Service khác
-Chạy các service còn lại theo cú pháp:
-```bash
-cd user-service  # hoặc book-service, borrowing-service, inventory-service, notification-service
-./gradlew bootRun
-```
 Mỗi service sẽ đăng ký với **Eureka Server** và có một cổng riêng:
 - **User Service**: `http://localhost:8081`
 - **Book Service**: `http://localhost:8082`
@@ -109,7 +102,7 @@ Mỗi service sẽ đăng ký với **Eureka Server** và có một cổng riên
 ---
 ## 4. Kiểm tra API
 
-### Swagger UI URL
+### 4.1. Kiểm tra API của từng Service với Swagger UI URL
 - **User Service**:  http://localhost:8081/swagger-ui/index.html
 - **Book Service**: http://localhost:8082/swagger-ui/index.html
 - **Borrowing Service**: http://localhost:8083/swagger-ui/index.html
@@ -117,32 +110,6 @@ Mỗi service sẽ đăng ký với **Eureka Server** và có một cổng riên
 - **Notification Service**: http://localhost:8085/swagger-ui/index.html
 - **Recommendation Service**: http://localhost:8086/swagger-ui/index.html
 
-### 4.1. Kiểm tra API của từng service
-#### User Service
-```bash
-curl -X GET http://localhost:8081/api/v1/user-service/users
-```
-#### Book Service
-```bash
-curl -X GET http://localhost:8082/api/v1/book-service/books
-```
-#### Borrowing Service
-```bash
-curl -X GET http://localhost:8083/api/v1/borrowing-service/borrowings
-```
-#### Inventory Service
-```bash
-curl -X GET http://localhost:8084/api/v1/inventory-service/inventory
-```
-#### Notification Service
-```bash
-curl -X GET http://localhost:8085/api/v1/notification-service/notifications
-```
-
-#### Recommendation Service
-```bash
-curl -X GET http://localhost:8086/api/v1/recommendation-service/recommendations
-```
 
 ### 4.2. Kiểm tra API qua Gateway
 API Gateway sẽ route các request đến các service tương ứng:
@@ -160,20 +127,12 @@ curl -X GET http://localhost:8080/api/v1/recommendation-service  # Gửi request
 Mở trình duyệt và truy cập **http://localhost:8761**, đảm bảo tất cả service đã đăng ký thành công.
 
 ---
-## 6. Ghi chú
-- Nếu gặp lỗi cổng đã sử dụng, hãy kiểm tra tiến trình đang chạy bằng:
-```bash
-lsof -i :8080  # Kiểm tra cổng đang sử dụng
-kill -9 <PID>  # Dừng tiến trình nếu cần
-```
-- Kiểm tra log của service khi gặp lỗi:
-```bash
-tail -f logs/app.log
-```
+## 6. Đóng góp
+Nếu bạn gặp lỗi hoặc muốn đóng góp cải tiến, hãy tạo Pull Request hoặc mở Issue trên repository của nhóm.
 
 ---
-## 7. Đóng góp
-Nếu bạn gặp lỗi hoặc muốn đóng góp cải tiến, hãy tạo Pull Request hoặc mở Issue trên repository của nhóm.
+
+
 
 ---
 
