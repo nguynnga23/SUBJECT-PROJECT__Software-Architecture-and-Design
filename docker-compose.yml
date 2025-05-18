@@ -115,7 +115,7 @@ services:
   config-service:
     build:
       context: ./config-service
-    image: config-service:latest
+    image: ${DOCKERHUB_USERNAME}/config-service:latest
     container_name: config-service
     ports:
       - "8888:8888"
@@ -131,7 +131,7 @@ services:
   discovery-service:
       build:
         context: ./discovery-service
-      image: discovery-service:latest
+      image: ${DOCKERHUB_USERNAME}/discovery-service:latest
       container_name: discovery-service
       ports:
         - "8761:8761"
@@ -148,7 +148,7 @@ services:
   gateway-service:
     build:
       context: ./gateway-service
-    image: gateway-service:latest
+    image: ${DOCKERHUB_USERNAME}/gateway-service:latest
     container_name: gateway-service
     ports:
       - "8080:8080"
@@ -161,7 +161,7 @@ services:
   user-service:
     build:
       context: ./user-service
-    image: user-service:latest
+    image: ${DOCKERHUB_USERNAME}/user-service:latest
     container_name: user-service
     ports:
       - "8081:8081"
@@ -176,7 +176,7 @@ services:
   book-service:
     build:
       context: ./book-service
-    image: book-service:latest
+    image: ${DOCKERHUB_USERNAME}/book-service:latest
     container_name: book-service
     ports:
       - "8082:8082"
@@ -190,7 +190,7 @@ services:
   borrowing-service:
     build:
       context: ./borrowing-service
-    image: borrowing-service:latest
+    image: ${DOCKERHUB_USERNAME}/borrowing-service:latest
     container_name: borrowing-service
     ports:
       - "8083:8083"
@@ -205,7 +205,7 @@ services:
   inventory-service:
     build:
       context: ./inventory-service
-    image: inventory-service:latest
+    image: ${DOCKERHUB_USERNAME}/inventory-service:latest
     container_name: inventory-service
     ports:
       - "8084:8084"
@@ -220,7 +220,7 @@ services:
   notification-service:
     build:
       context: ./notification-service
-    image: notification-service:latest
+    image: ${DOCKERHUB_USERNAME}/notification-service:latest
     container_name: notification-service
     ports:
       - "8085:8085"
