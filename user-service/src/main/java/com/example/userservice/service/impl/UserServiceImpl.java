@@ -1,15 +1,12 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.entity.User;
-import com.example.userservice.enums.Role;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,20 +42,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-
-    @Override
-    public User createUser(User user) {
-        if (user.getRole() == null) {
-            user.setRole(Role.USER); // define USER
-        }
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
-        }
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        User newUser = userRepository.save(user);
-        userRedisServiceImpl.save("USER_" + newUser.getUserId(), newUser, 10);
-        return newUser;
-    }
 
     @Override
     public User updateUser(UUID userId, User user) {
