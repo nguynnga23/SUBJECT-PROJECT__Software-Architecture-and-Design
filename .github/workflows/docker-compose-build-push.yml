@@ -3,7 +3,7 @@ name: Build and Push Docker Images
 on:
   push:
     branches:
-      - main  # Thay đổi thành nhánh bạn muốn theo dõi
+      - 4-devops-setting-up-a-cicd-pipeline
 
 jobs:
   build-and-push:
