@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/authors")
+@RequestMapping("/api/v1/book-service/authors")
 public class AuthorController {
     @Autowired
     private AuthorService authorService;
