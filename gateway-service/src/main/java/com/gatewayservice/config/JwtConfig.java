@@ -5,12 +5,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.stream.Collectors;
 
 @Configuration
 public class JwtConfig {
@@ -18,7 +21,11 @@ public class JwtConfig {
     public JwtUtil jwtUtil() throws Exception {
         // Đọc file từ classpath
         ClassPathResource resource = new ClassPathResource("publickey.pem");
-        String publicKeyPem = new String(Files.readAllBytes(resource.getFile().toPath()));
+        String publicKeyPem;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+            publicKeyPem = reader.lines().collect(Collectors.joining("\n"));
+        }
+//        String publicKeyPem = new String(Files.readAllBytes(resource.getFile().toPath()));
         String key = publicKeyPem.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
