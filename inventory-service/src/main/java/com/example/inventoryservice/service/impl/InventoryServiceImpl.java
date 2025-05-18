@@ -45,52 +45,65 @@ public class InventoryServiceImpl implements InventoryService{
 
     @Override
     public Inventory updateInventory(UUID bookCopyId, Inventory newInventory) {
-        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId).orElseThrow(EntityNotFoundException::new);
+        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
+                .orElseThrow(() -> new EntityNotFoundException("BookCopy not found with ID: " + bookCopyId));
+
         Inventory inventory = inventoryRepository.getInventoryByBookId(bookCopy.getBookId());
         if (inventory == null) {
             throw new EntityNotFoundException("Inventory not found for bookId: " + bookCopy.getBookId());
         }
-        if (newInventory.getBorrowed() != null) {
-            inventory.setBorrowed(newInventory.getBorrowed());
+
+        // Chỉ cập nhật trạng thái của BookCopy
+        if (newInventory.getBorrowed() != null && newInventory.getBorrowed() > 0) {
+            bookCopy.setStatus(Status.BORROWED);
+        } else if (newInventory.getDamaged() != null && newInventory.getDamaged() > 0) {
+            bookCopy.setStatus(Status.DAMAGED);
+        } else if (newInventory.getLost() != null && newInventory.getLost() > 0) {
+            bookCopy.setStatus(Status.LOST);
+        } else {
+            bookCopy.setStatus(Status.AVAILABLE);
         }
-        if (newInventory.getDamaged() != null) {
-            inventory.setDamaged(newInventory.getDamaged());
-        }
-        if (newInventory.getAvailable() != null) {
-            inventory.setAvailable(newInventory.getAvailable());
-        }
-        if (newInventory.getLost() != null) {
-            inventory.setLost(newInventory.getLost());
-        }
-        if (newInventory.getTotalQuantity() != null) {
-            inventory.setTotalQuantity(newInventory.getTotalQuantity());
-        }
-        return inventoryRepository.save(inventory);
+
+        // Lưu BookCopy sau khi cập nhật
+        bookCopyRepository.save(bookCopy);
+        return inventoryRepository.getInventoryByBookId(bookCopy.getBookId()); // Lấy lại Inventory đã cập nhật
     }
+
 
     @Override
     public Inventory updateActionInventory(UUID bookId, Status status) {
         Inventory inventory = inventoryRepository.getInventoryByBookId(bookId);
-        switch (status){
+
+        if (inventory == null) {
+            throw new IllegalArgumentException("Inventory not found for bookId: " + bookId);
+        }
+
+        // Lấy danh sách bản sao của sách
+        BookCopy bookCopy = inventory.getBookCopies().stream()
+                .filter(copy -> copy.getStatus().name().equalsIgnoreCase(Status.AVAILABLE.name())
+                        || (status == Status.AVAILABLE && copy.getStatus().name().equalsIgnoreCase(Status.BORROWED.name())))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No suitable book copy found for the action."));
+
+        switch (status) {
             case BORROWED:
-                inventory.setAvailable(inventory.getAvailable() - 1);
-                inventory.setBorrowed(inventory.getBorrowed() + 1);
+                bookCopy.setStatus(Status.BORROWED);
                 break;
-            case AVAILABLE: // Tra sach
-                inventory.setAvailable(inventory.getAvailable() + 1);
-                inventory.setBorrowed(inventory.getBorrowed() - 1);
+            case AVAILABLE: // Trả sách
+                bookCopy.setStatus(Status.AVAILABLE);
                 break;
             case LOST:
-                inventory.setLost(inventory.getLost() + 1);
-                inventory.setBorrowed(inventory.getBorrowed() - 1);
+                bookCopy.setStatus(Status.LOST);
                 break;
             case DAMAGED:
-                inventory.setDamaged(inventory.getDamaged() + 1);
-                inventory.setBorrowed(inventory.getBorrowed() - 1);
+                bookCopy.setStatus(Status.DAMAGED);
                 break;
         }
-        return inventoryRepository.save(inventory);
+
+        bookCopyRepository.save(bookCopy); // Cập nhật book copy
+        return inventory; // Không cần save lại inventory vì bookCopies đã được cập nhật
     }
+
 
     @Override
     public boolean checkAvailableQuantity(UUID bookId) {
@@ -103,13 +116,16 @@ public class InventoryServiceImpl implements InventoryService{
 
     @Override
     public void updateBookAvailability(UUID bookCopyId) {
-        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId).orElseThrow(EntityNotFoundException::new);
-        Inventory inventory = inventoryRepository.getInventoryByBookId(bookCopy.getBookId());
-        if (inventory == null) {
-            throw new EntityNotFoundException("Inventory not found for bookId: " + bookCopy.getBookId());
+        BookCopy bookCopy = bookCopyRepository.findById(bookCopyId)
+                .orElseThrow(() -> new EntityNotFoundException("BookCopy not found with ID: " + bookCopyId));
+
+        if (!bookCopy.getStatus().name().equalsIgnoreCase(Status.AVAILABLE.name())) {
+            throw new IllegalArgumentException("BookCopy is not available for borrowing.");
         }
-        inventory.setAvailable(inventory.getAvailable() - 1);
-        inventory.setBorrowed(inventory.getBorrowed() + 1);
-        inventoryRepository.save(inventory);
+
+        // Cập nhật trạng thái của BookCopy thành BORROWED
+        bookCopy.setStatus(Status.BORROWED);
+        bookCopyRepository.save(bookCopy);
     }
+
 }

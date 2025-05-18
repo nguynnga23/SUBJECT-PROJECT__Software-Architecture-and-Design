@@ -42,7 +42,6 @@ public class BorrowKafkaConsumer {
                 System.out.println("Processing BookCopy ID: " + bookCopyId);
 
                 // Cập nhật số lượng và trạng thái sách
-                inventoryService.updateBookAvailability(bookCopyId);
                 bookCopyService.updateBookCopyStatus(bookCopyId, Status.BORROWED);
             }
         } catch (Exception e) {

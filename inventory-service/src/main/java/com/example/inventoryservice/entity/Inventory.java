@@ -28,15 +28,33 @@ public class Inventory {
     @Column(name = "total_quantity")
     private Integer totalQuantity;
 
-    private Integer available;
-
-    private Integer borrowed;
-
-    private Integer lost;
-
-    private Integer damaged;
-
     @OneToMany(mappedBy = "inventory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private Set<BookCopy> bookCopies;
+
+    public Integer getAvailable() {
+        return (int) bookCopies.stream().filter(copy -> copy.getStatus().name().equalsIgnoreCase("AVAILABLE")).count();
+    }
+
+    public Integer getBorrowed() {
+        return (int) bookCopies.stream().filter(copy -> copy.getStatus().name().equalsIgnoreCase("BORROWED")).count();
+    }
+
+    public Integer getLost() {
+        return (int) bookCopies.stream().filter(copy -> copy.getStatus().name().equalsIgnoreCase("LOST")).count();
+    }
+
+    public Integer getDamaged() {
+        return (int) bookCopies.stream().filter(copy -> copy.getStatus().name().equalsIgnoreCase("DAMAGED")).count();
+    }
+
+    // Method to calculate totalQuantity based on bookCopies size
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    private void updateTotalQuantity() {
+        if (this.bookCopies != null) {
+            this.totalQuantity = this.bookCopies.size();
+        }
+    }
 }
