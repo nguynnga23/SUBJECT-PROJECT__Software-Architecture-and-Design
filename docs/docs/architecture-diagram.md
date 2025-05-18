@@ -8,7 +8,7 @@ Khi bạn chọn kiến trúc **Microservices** cho toàn bộ hệ thống qu�
 
 ---
 
-## 1. Tổng Quan Kiến Trúc Thiết Kế Phần Mềm
+## 1. Tổng Quan Thiết Kế Phần Mềm
 
 - **Ý nghĩa của Microservices**: Hệ thống được chia thành các dịch vụ nhỏ, độc lập (Book Service, User Service, Borrowing Service, Notification Service), mỗi dịch vụ chạy riêng biệt và giao tiếp qua API hoặc message queue.
 - **Vai trò của Spring Boot**: Spring Boot cung cấp nền tảng để triển khai từng Microservice nhanh chóng, với embedded server, cấu hình tự động, và tích hợp các công cụ như Spring Cloud, Spring Data, Spring Kafka.
@@ -156,6 +156,50 @@ flowchart TD;
 
 ---
 
+```plantuml
+@startuml
+!define RECTANGLE class
+
+' Các thành phần chính
+RECTANGLE "Client" as Client
+RECTANGLE "API Gateway" as APIGateway
+RECTANGLE "Service Registry\n(Eureka/Consul)" as ServiceRegistry
+RECTANGLE "User Service" as UserService
+RECTANGLE "Book Service" as BookService
+RECTANGLE "Borrowing Service" as BorrowingService
+RECTANGLE "Inventory Service" as InventoryService
+RECTANGLE "Notification Service" as NotificationService
+RECTANGLE "Message Queue\n(Kafka/RabbitMQ)" as MessageQueue
+
+' Luồng giao tiếp chính
+
+' Client -> API Gateway -> Services
+Client --> APIGateway : Sends Request
+APIGateway --> ServiceRegistry : Queries Service
+APIGateway --> UserService : Routes
+APIGateway --> BookService : Routes
+APIGateway --> BorrowingService : Routes
+APIGateway --> InventoryService : Routes
+APIGateway --> NotificationService : Routes
+
+' Service đăng ký với Service Registry
+UserService --> ServiceRegistry : Registers
+BookService --> ServiceRegistry : Registers
+BorrowingService --> ServiceRegistry : Registers
+InventoryService --> ServiceRegistry : Registers
+NotificationService --> ServiceRegistry : Registers
+
+' Synchronous Communication (REST API)
+UserService --> BookService : REST API Call
+BorrowingService --> InventoryService : REST API Call
+
+' Asynchronous Communication (Event-driven)
+BorrowingService --> MessageQueue : Publishes Event\n(Book Borrowed)
+MessageQueue --> InventoryService : Updates Stock
+MessageQueue --> NotificationService : Sends Email
+
+@enduml
+```
 ## 4. Cách Spring Boot Hỗ Trợ Microservices
 
 ### a. Triển Khai Độc Lập
