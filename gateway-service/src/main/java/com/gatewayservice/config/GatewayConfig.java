@@ -129,7 +129,7 @@ public class GatewayConfig {
     }
     @Bean
     public RedisRateLimiter redisRateLimiter() {
-           return new RedisRateLimiter(1, 5);
+           return new RedisRateLimiter(10, 20);
     }
     @Bean
     KeyResolver ipKeyResolver() {

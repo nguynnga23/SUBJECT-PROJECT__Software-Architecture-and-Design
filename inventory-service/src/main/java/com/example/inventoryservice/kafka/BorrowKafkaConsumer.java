@@ -40,9 +40,13 @@ public class BorrowKafkaConsumer {
             for (ReaderRequestDetailDTO detail : readerRequestDTO.getReaderRequestDetails()) {
                 UUID bookCopyId = detail.getBookCopy().getId(); // Lấy ID từ BookCopyDTO
                 System.out.println("Processing BookCopy ID: " + bookCopyId);
-
                 // Cập nhật số lượng và trạng thái sách
-                bookCopyService.updateBookCopyStatus(bookCopyId, Status.BORROWED);
+                String status = readerRequestDTO.getStatus();
+                switch (status) {
+                    case "PENDING" -> bookCopyService.updateBookCopyStatus(bookCopyId, Status.BORROWED);
+                    case "RETURNED", "CANCELED" -> bookCopyService.updateBookCopyStatus(bookCopyId, Status.AVAILABLE);
+                    default -> throw new IllegalArgumentException("Invalid status: " + status);
+                }
             }
         } catch (Exception e) {
             System.err.println("Error processing BorrowCreated event: " + e.getMessage());

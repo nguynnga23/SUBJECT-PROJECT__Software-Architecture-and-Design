@@ -227,7 +227,7 @@ services:
     networks:
       - backend
     environment:
-      - EMAIL_USERNAME=nguyennga200x@gmail.com
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD} # Được lấy từ file .env
     depends_on:
       - postgres

@@ -2,7 +2,7 @@ name: Deploy Docusaurus to GitHub Pages
 
 on:
   push:
-    branches: ["18-docs-setup-docusaurus-vs-mermaid-and-github-action"]  # Chạy khi có push lên main
+    branches: ["main"]  # Chạy khi có push lên main
   workflow_dispatch:  # Cho phép chạy thủ công từ Actions tab
 
 permissions:

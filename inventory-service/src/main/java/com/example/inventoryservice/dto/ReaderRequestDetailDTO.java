@@ -1,27 +1,18 @@
 package com.example.inventoryservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Setter
 @Getter
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReaderRequestDetailDTO {
     private BookCopyDTO bookCopy;
 
-    @JsonCreator
-    public ReaderRequestDetailDTO(
-        @JsonProperty("bookCopyId") BookCopyDTO bookCopy
-    ) {
-        this.bookCopy = bookCopy;
-    }
-
+    // Không cần @JsonCreator nếu bạn muốn ánh xạ tự động toàn bộ đối tượng
     public ReaderRequestDetailDTO() {
     }
-
 }
