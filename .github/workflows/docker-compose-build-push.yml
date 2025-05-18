@@ -43,9 +43,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Verify Docker Login
+        run: docker info | grep Username
+
       - name: Make Gradle Wrapper Executable
         run: chmod +x */gradlew
-
+        
       - name: Build and Push Docker Images with Docker Compose
         run: |
           docker compose version
