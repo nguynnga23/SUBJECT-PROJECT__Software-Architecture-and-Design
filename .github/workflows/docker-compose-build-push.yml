@@ -30,6 +30,8 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
       CONFIG_SERVICE_URL: https://config-service-latest-s9vr.onrender.com # Đặt URL Config Server của bạn
+      DISCOVERY_SERVICE_URL: https://discovery-service-latest.onrender.com # Đặt URL Config Server của bạn
+
       
     steps:
       - name: Checkout code
@@ -66,7 +68,8 @@ jobs:
       - name: Login to Render CLI
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        run: render login --api-key $RENDER_API_KEY
+        run: render login
+
 
       - name: Set Render Workspace
         run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }} --confirm

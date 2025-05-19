@@ -160,6 +160,7 @@ services:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
       - SPRING_CLOUD_CONFIG_LABEL=main
+      - DISCOVERY_SERVICE_URL=${DISCOVERY_SERVICE_URL}
 
   user-service:
     build:
@@ -178,7 +179,9 @@ services:
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
-      - SPRING_CLOUD_CONFIG_LABEL=main
+      - SPRING_CLOUD_CONFIG_LABEL=main\
+      - DISCOVERY_SERVICE_URL=${DISCOVERY_SERVICE_URL}
+
   book-service:
     build:
       context: ./book-service
@@ -196,6 +199,8 @@ services:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
       - SPRING_CLOUD_CONFIG_LABEL=main
+      - DISCOVERY_SERVICE_URL=${DISCOVERY_SERVICE_URL}
+
   borrowing-service:
     build:
       context: ./borrowing-service
@@ -214,6 +219,8 @@ services:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
       - SPRING_CLOUD_CONFIG_LABEL=main
+      - DISCOVERY_SERVICE_URL=${DISCOVERY_SERVICE_URL}
+
   inventory-service:
     build:
       context: ./inventory-service
@@ -232,6 +239,8 @@ services:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
       - SPRING_CLOUD_CONFIG_LABEL=main
+      - DISCOVERY_SERVICE_URL=${DISCOVERY_SERVICE_URL}
+
   notification-service:
     build:
       context: ./notification-service
@@ -247,6 +256,8 @@ services:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
       - SPRING_CLOUD_CONFIG_LABEL=main
+      - DISCOVERY_SERVICE_URL=${DISCOVERY_SERVICE_URL}
+
     depends_on:
       - postgres
       - config-service
