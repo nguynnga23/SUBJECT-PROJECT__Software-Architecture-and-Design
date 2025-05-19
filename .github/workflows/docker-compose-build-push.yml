@@ -68,18 +68,18 @@ jobs:
       - name: Set Render Workspace
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }} --confirm
+        run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }} --confirm -o json
 
       - name: Deploy Services to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_USER_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_BOOK_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }} --confirm
-          render deploys create ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_USER_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_BOOK_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }} --confirm -o json
 
