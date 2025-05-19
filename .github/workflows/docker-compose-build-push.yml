@@ -29,7 +29,8 @@ jobs:
 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
-
+      CONFIG_SERVICE_URL: https://config-service-latest-s9vr.onrender.com # Đặt URL Config Server của bạn
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -54,3 +55,19 @@ jobs:
           docker compose version
           docker compose build --parallel
           docker compose push
+
+
+      - name: Install Render CLI
+        run: curl -fsSL https://cli.render.com/install | bash
+
+      - name: Deploy Services to Render
+        run: |
+          export RENDER_API_KEY=${{ secrets.RENDER_API_KEY }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_USER_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_BOOK_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }}
+          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }}

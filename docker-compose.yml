@@ -141,8 +141,7 @@ services:
         - config-service
         - postgres
       environment:
-        - SPRING_APPLICATION_NAME=discovery-service
-        - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+        - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
         - SPRING_CLOUD_CONFIG_PROFILE=default
         - SPRING_CLOUD_CONFIG_LABEL=main
   gateway-service:
@@ -157,6 +156,10 @@ services:
     depends_on:
       - config-service
       - discovery-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
+      - SPRING_CLOUD_CONFIG_PROFILE=default
+      - SPRING_CLOUD_CONFIG_LABEL=main
 
   user-service:
     build:
@@ -172,7 +175,10 @@ services:
       - config-service
       - discovery-service
       - redis
-
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
+      - SPRING_CLOUD_CONFIG_PROFILE=default
+      - SPRING_CLOUD_CONFIG_LABEL=main
   book-service:
     build:
       context: ./book-service
@@ -186,7 +192,10 @@ services:
       - postgres
       - config-service
       - discovery-service
-
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
+      - SPRING_CLOUD_CONFIG_PROFILE=default
+      - SPRING_CLOUD_CONFIG_LABEL=main
   borrowing-service:
     build:
       context: ./borrowing-service
@@ -201,7 +210,10 @@ services:
       - kafka
       - config-service
       - discovery-service
-
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
+      - SPRING_CLOUD_CONFIG_PROFILE=default
+      - SPRING_CLOUD_CONFIG_LABEL=main
   inventory-service:
     build:
       context: ./inventory-service
@@ -216,7 +228,10 @@ services:
       - kafka
       - config-service
       - discovery-service
-
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
+      - SPRING_CLOUD_CONFIG_PROFILE=default
+      - SPRING_CLOUD_CONFIG_LABEL=main
   notification-service:
     build:
       context: ./notification-service
@@ -229,6 +244,9 @@ services:
     environment:
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD} # Được lấy từ file .env
+      - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG_SERVICE_URL}
+      - SPRING_CLOUD_CONFIG_PROFILE=default
+      - SPRING_CLOUD_CONFIG_LABEL=main
     depends_on:
       - postgres
       - config-service
