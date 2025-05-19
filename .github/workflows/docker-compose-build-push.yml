@@ -60,15 +60,18 @@ jobs:
         run: |
           curl -L https://github.com/render-oss/cli/releases/download/v1.1.0/cli_1.1.0_linux_amd64.zip -o render.zip
           unzip -o render.zip
-          ls -l
           sudo mv cli_v1.1.0 /usr/local/bin/render
           sudo chmod +x /usr/local/bin/render
-      - name: Set Render Workspace
-        run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }}
-        
-      - name: Deploy Services to Render
+
+      - name: Login to Render CLI
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: render login --api-key $RENDER_API_KEY
+
+      - name: Set Render Workspace
+        run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }} --confirm
+
+      - name: Deploy Services to Render
         run: |
           render deploys create ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }} --confirm
           render deploys create ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }} --confirm
@@ -78,3 +81,4 @@ jobs:
           render deploys create ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }} --confirm
           render deploys create ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }} --confirm
           render deploys create ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }} --confirm
+

@@ -20,6 +20,5 @@ WORKDIR /app
 #     curl -L https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
 #     | tar -C /usr/local/bin -xz && \
 #     apt-get remove -y curl && apt-get autoremove -y && apt-get clean
-# COPY --from=builder /app/build/libs/discovery-service-*-SNAPSHOT.jar app.jar
-
+COPY --from=builder /app/build/libs/discovery-service-*-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
