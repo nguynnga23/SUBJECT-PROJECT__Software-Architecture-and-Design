@@ -68,12 +68,11 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_USER_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_BOOK_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }}
-          render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }}
-
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_USER_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_BOOK_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }} --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }} --confirm
