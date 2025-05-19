@@ -1,0 +1,40 @@
+name: Deploy to Render
+
+on:
+  workflow_dispatch:    # Cho phép bạn trigger thủ công trong GitHub UI
+  push:
+    branches:
+      - 4-devops-setting-up-a-cicd-pipeline          # Hoặc nhánh bạn muốn deploy khi push
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download Render CLI
+        run: |
+          curl -L https://github.com/render-oss/cli/releases/download/v1.1.0/cli_1.1.0_linux_amd64.zip -o render.zip
+          unzip -o render.zip
+          sudo mv cli_v1.1.0 /usr/local/bin/render
+          sudo chmod +x /usr/local/bin/render
+
+      - name: Set Render Workspace
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }} --confirm -o json
+
+      - name: Deploy Services to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_USER_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_BOOK_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }} --confirm -o json
