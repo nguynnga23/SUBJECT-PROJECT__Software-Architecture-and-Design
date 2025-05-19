@@ -56,17 +56,18 @@ jobs:
           docker compose build --parallel
           docker compose push
 
-      - name: Install Render CLI
-        run: curl -fsSL https://cli.render.com/install | bash
-      
-      - name: Add Render CLI to PATH
-        run: echo "$HOME/.render/bin" >> $GITHUB_PATH
-      
-      - name: Verify Render CLI installation
-        run: render --version
-      - name: Deploy Services to Render
+      - name: Download Render CLI
         run: |
-          export RENDER_API_KEY=${{ secrets.RENDER_API_KEY }}
+          curl -L https://github.com/render-oss/cli/releases/download/v1.1.0/cli_1.1.0_linux_amd64.zip -o render.zip
+          unzip render.zip
+          ls -l
+          sudo mv cli_v1.1.0 /usr/local/bin/render
+          sudo chmod +x /usr/local/bin/render
+
+      - name: Deploy Services to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
           render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }}
           render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }}
           render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_GATEWAY_SERVICE }}
@@ -75,3 +76,4 @@ jobs:
           render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }}
           render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }}
           render deploy service --service-id ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }}
+
