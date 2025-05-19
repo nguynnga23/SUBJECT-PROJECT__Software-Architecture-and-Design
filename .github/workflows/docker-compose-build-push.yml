@@ -9,23 +9,23 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     env:
-      MONGO_INITDB_DATABASE: ${{ secrets.MONGO_INITDB_DATABASE }}
-      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
-      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
-      SPRING_DATA_MONGODB_URI: ${{ secrets.SPRING_DATA_MONGODB_URI }}
+      # MONGO_INITDB_DATABASE: ${{ secrets.MONGO_INITDB_DATABASE }}
+      # MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+      # MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+      # SPRING_DATA_MONGODB_URI: ${{ secrets.SPRING_DATA_MONGODB_URI }}
 
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      # POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      # POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      # POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
-      PGADMIN_DEFAULT_EMAIL: ${{ secrets.PGADMIN_DEFAULT_EMAIL }}
-      PGADMIN_DEFAULT_PASSWORD: ${{ secrets.PGADMIN_DEFAULT_PASSWORD }}
+      # PGADMIN_DEFAULT_EMAIL: ${{ secrets.PGADMIN_DEFAULT_EMAIL }}
+      # PGADMIN_DEFAULT_PASSWORD: ${{ secrets.PGADMIN_DEFAULT_PASSWORD }}
 
-      MONGO_EXPRESS_USERNAME: ${{ secrets.MONGO_EXPRESS_USERNAME }}
-      MONGO_EXPRESS_PASSWORD: ${{ secrets.MONGO_EXPRESS_PASSWORD }}
+      # MONGO_EXPRESS_USERNAME: ${{ secrets.MONGO_EXPRESS_USERNAME }}
+      # MONGO_EXPRESS_PASSWORD: ${{ secrets.MONGO_EXPRESS_PASSWORD }}
 
-      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
-      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      # EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      # EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
@@ -65,16 +65,14 @@ jobs:
           sudo mv cli_v1.1.0 /usr/local/bin/render
           sudo chmod +x /usr/local/bin/render
 
-      - name: Login to Render CLI
+      - name: Set Render Workspace
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        run: render login
-
-
-      - name: Set Render Workspace
         run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }} --confirm
 
       - name: Deploy Services to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           render deploys create ${{ secrets.RENDER_SERVICE_ID_CONFIG_SERVICE }} --confirm
           render deploys create ${{ secrets.RENDER_SERVICE_ID_DISCOVERY_SERVICE }} --confirm
