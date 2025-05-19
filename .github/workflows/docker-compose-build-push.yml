@@ -56,10 +56,14 @@ jobs:
           docker compose build --parallel
           docker compose push
 
-
       - name: Install Render CLI
         run: curl -fsSL https://cli.render.com/install | bash
-
+      
+      - name: Add Render CLI to PATH
+        run: echo "$HOME/.render/bin" >> $GITHUB_PATH
+      
+      - name: Verify Render CLI installation
+        run: render --version
       - name: Deploy Services to Render
         run: |
           export RENDER_API_KEY=${{ secrets.RENDER_API_KEY }}
