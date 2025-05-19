@@ -63,7 +63,9 @@ jobs:
           ls -l
           sudo mv cli_v1.1.0 /usr/local/bin/render
           sudo chmod +x /usr/local/bin/render
-
+      - name: Set Render Workspace
+        run: render workspace set ${{ secrets.RENDER_WORKSPACE_ID }}
+        
       - name: Deploy Services to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
