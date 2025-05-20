@@ -94,8 +94,6 @@ services:
     container_name: library-chatbox
     ports:
       - "3000:3000"
-    env_file:
-      - .env
     networks:
       - backend
   config-service:
