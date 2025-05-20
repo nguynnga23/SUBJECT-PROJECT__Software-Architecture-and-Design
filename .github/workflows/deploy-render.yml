@@ -4,7 +4,7 @@ on:
   workflow_dispatch:    # Cho phép bạn trigger thủ công trong GitHub UI
   push:
     branches:
-      - 4-devops-setting-up-a-cicd-pipeline          # Hoặc nhánh bạn muốn deploy khi push
+      - main          # Hoặc nhánh bạn muốn deploy khi push
 
 jobs:
   deploy:
