@@ -43,7 +43,6 @@ services:
         - backend
       depends_on:
         - config-service
-        - postgres
       environment:
         - CONFIG_SERVICE_URL=${CONFIG_SERVICE_URL}
         - SPRING_CLOUD_CONFIG_PROFILE=default
@@ -99,10 +98,8 @@ services:
     networks:
       - backend
     depends_on:
-      - postgres
       - config-service
       - discovery-service
-      - redis
     environment:
       - CONFIG_SERVICE_URL=${CONFIG_SERVICE_URL}
       - SPRING_CLOUD_CONFIG_PROFILE=default
@@ -130,7 +127,6 @@ services:
     networks:
       - backend
     depends_on:
-      - postgres
       - config-service
       - discovery-service
     environment:
@@ -160,8 +156,6 @@ services:
     networks:
       - backend
     depends_on:
-      - postgres
-      - kafka
       - config-service
       - discovery-service
     environment:
@@ -191,8 +185,6 @@ services:
     networks:
       - backend
     depends_on:
-      - postgres
-      - kafka
       - config-service
       - discovery-service
     environment:
@@ -239,10 +231,8 @@ services:
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
 
     depends_on:
-      - postgres
       - config-service
       - discovery-service
-      - kafka
 
 networks:
   backend:
