@@ -1,92 +1,6 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres-container
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
-    networks:
-      - backend
-    restart: always
-
-  pgadmin:
-      image: dpage/pgadmin4:latest
-      container_name: pgadmin4-container
-      environment:
-        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      ports:
-        - "80:80"
-      networks:
-        - backend
-      depends_on:
-        - postgres
-      restart: always
-
-  redis:
-    image: redis:latest
-    container_name: redis-container
-    ports:
-      - "6379:6379"
-    networks:
-      - backend
-    volumes:
-      - redis_data:/data
-    restart: always
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_INIT_LIMIT: 5
-      ZOOKEEPER_SYNC_LIMIT: 2
-    networks:
-      - backend
-
-  kafka:
-    image: confluentinc/cp-kafka
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
-      KAFKA_LISTENER_NAME_PLAINTEXT_PORT: 9092
-      KAFKA_LISTENER_NAME_PLAINTEXT_HOSTNAME: 0.0.0.0
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LISTENER_NAME_PLAINTEXT_VERSIONS: 1.0
-    depends_on:
-      - zookeeper
-    networks:
-      - backend
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
-    user: root
-    ports:
-      - "9093:8080" # Mapped port 9091 on host to 8080 on container
-      - "50000:50000" # Mapped port 50000 for Jenkins agent communication
-    volumes:
-      - jenkins_data:/var/jenkins_home # Mount a volume for Jenkins data persistence
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /snap/bin/docker:/usr/bin/docker
-    networks:
-      - backend
-
   library-chatbox:
     build: 
       context: ./library-chatbox
@@ -333,9 +247,3 @@ services:
 networks:
   backend:
     driver: bridge
-
-volumes:
-  postgres_data:
-  redis_data:
-  mongo-data:
-  jenkins_data:
