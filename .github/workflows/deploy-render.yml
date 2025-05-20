@@ -4,7 +4,7 @@ on:
   workflow_dispatch:    # Cho phép bạn trigger thủ công trong GitHub UI
   push:
     branches:
-      - main          # Hoặc nhánh bạn muốn deploy khi push
+      - 4-devops-setting-up-a-cicd-pipeline          # Hoặc nhánh bạn muốn deploy khi push
 
 jobs:
   deploy:
@@ -38,3 +38,5 @@ jobs:
           render deploys create ${{ secrets.RENDER_SERVICE_ID_BORROWING_SERVICE }} --confirm -o json
           render deploys create ${{ secrets.RENDER_SERVICE_ID_INVENTORY_SERVICE }} --confirm -o json
           render deploys create ${{ secrets.RENDER_SERVICE_ID_NOTIFICATION_SERVICE }} --confirm -o json
+          render deploys create ${{ secrets.RENDER_SERVICE_ID_LIBRARY_CHATBOX }} --confirm -o json
+
