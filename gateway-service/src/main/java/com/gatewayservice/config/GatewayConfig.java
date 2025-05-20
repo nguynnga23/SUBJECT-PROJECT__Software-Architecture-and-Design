@@ -33,10 +33,6 @@ public class GatewayConfig {
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
                                         .setKeyResolver(ipKeyResolver())    // Xác định theo IP
                                 )
-                                .circuitBreaker(c -> c
-                                        .setName("bookCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback")
-                                )
                         )
                         .uri("lb://BOOK-SERVICE"))
                 .route("borrowing-service", r -> r.path("/api/v1/borrowing-service/**")
@@ -50,10 +46,6 @@ public class GatewayConfig {
                                 .requestRateLimiter(c -> c
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
                                         .setKeyResolver(ipKeyResolver())    // Xác định theo IP
-                                )
-                                .circuitBreaker(c -> c
-                                        .setName("borrowingCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback")
                                 )
                         ) // Áp dụng filter cho JWT
                         .uri("lb://BORROWING-SERVICE")) // Dịch vụ book-service sử dụng load balancer
@@ -69,9 +61,6 @@ public class GatewayConfig {
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
                                         .setKeyResolver(ipKeyResolver())    // Xác định theo IP
                                 )
-                                .circuitBreaker(c -> c
-                                        .setName("userCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback"))
                         ) // Áp dụng filter cho JWT
                         .uri("lb://USER-SERVICE")) // Dịch vụ user-service sử dụng load balancer
                 .route("inventory-service", r -> r.path("/api/v1/inventory-service/**")
@@ -86,9 +75,6 @@ public class GatewayConfig {
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
                                         .setKeyResolver(ipKeyResolver())    // Xác định theo IP
                                 )
-                                .circuitBreaker(c -> c
-                                        .setName("inventoryCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback"))
                         ) // Áp dụng filter cho JWT
                         .uri("lb://INVENTORY-SERVICE")) // Dịch vụ inventory-service sử dụng load balancer
                 .route("notification-service", r -> r.path("/api/v1/notification-service/**")
@@ -103,9 +89,6 @@ public class GatewayConfig {
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
                                         .setKeyResolver(ipKeyResolver())    // Xác định theo IP
                                 )
-                                .circuitBreaker(c -> c
-                                        .setName("notificationCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback"))
                         ) // Áp dụng filter cho JWT
                         .uri("lb://NOTIFICATION-SERVICE")) // Dịch vụ notification-service sử dụng load balancer
                 .route("recommendation-service", r -> r.path("/api/v1/recommendation-service/**")
@@ -120,9 +103,6 @@ public class GatewayConfig {
                                         .setRateLimiter(redisRateLimiter()) // Sử dụng RedisRateLimiter
                                         .setKeyResolver(ipKeyResolver())    // Xác định theo IP
                                 )
-                                .circuitBreaker(c -> c
-                                        .setName("recommendationCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback"))
                         )
                         .uri("lb://RECOMMENDATION-SERVICE")) // Dịch vụ notification-service sử dụng load balancer
                 .build(); // Kết thúc việc cấu hình các route
