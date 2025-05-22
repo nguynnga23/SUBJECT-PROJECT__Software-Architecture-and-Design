@@ -1,14 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const { initHistory, getResponse } = require("../services/chatService");
-// Lưu tạm lịch sử hội thoại trong bộ nhớ RAM
-let chatHistory = initHistory();
+
+let chatHistory = [];
+
+// Gọi async để khởi tạo lịch sử trước khi xử lý request
+(async () => {
+  try {
+    chatHistory = await initHistory();
+  } catch (err) {
+    console.error("Lỗi khi khởi tạo chatHistory:", err.message);
+  }
+})();
 
 router.post("/", async (req, res) => {
   const { message } = req.body;
+
   try {
     const { answer, updatedHistory } = await getResponse(message, chatHistory);
-    chatHistory = updatedHistory; // Cập nhật lại lịch sử với câu trả lời
+    chatHistory = updatedHistory;
 
     res.json({ response: answer });
   } catch (err) {

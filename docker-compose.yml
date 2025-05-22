@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   library-chatbox:
     build: 
@@ -87,7 +86,6 @@ services:
       - SPRING_DATA_REDIS_TIMEOUT=${SPRING_DATA_REDIS_TIMEOUT}
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-
   user-service:
     build:
       context: ./user-service
@@ -116,7 +114,6 @@ services:
       - SPRING_DATA_REDIS_TIMEOUT=${SPRING_DATA_REDIS_TIMEOUT}
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-
   book-service:
     build:
       context: ./book-service
@@ -145,7 +142,6 @@ services:
       - SPRING_DATA_REDIS_TIMEOUT=${SPRING_DATA_REDIS_TIMEOUT}
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-
   borrowing-service:
     build:
       context: ./borrowing-service
@@ -174,7 +170,6 @@ services:
       - SPRING_DATA_REDIS_TIMEOUT=${SPRING_DATA_REDIS_TIMEOUT}
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-
   inventory-service:
     build:
       context: ./inventory-service
@@ -203,7 +198,6 @@ services:
       - SPRING_DATA_REDIS_TIMEOUT=${SPRING_DATA_REDIS_TIMEOUT}
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-
   notification-service:
     build:
       context: ./notification-service
@@ -233,7 +227,6 @@ services:
     depends_on:
       - config-service
       - discovery-service
-
 networks:
   backend:
     driver: bridge
