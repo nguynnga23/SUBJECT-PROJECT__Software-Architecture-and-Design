@@ -121,9 +121,9 @@ curl -X GET http://localhost:8080/api/v1/notification-service/notifications  # G
 
 ```
 ## 6. Tài liệu liên quan
-- `https://nguynnga23.github.io/SUBJECT-PROJECT__Software-Architecture-and-Design/docs/intro`
-- `https://telling-tray-627.notion.site/K-ch-b-n-Thuy-t-tr-nh-v-Demo-20-ph-t-1f644365a56880428d54cccc33219764`
-- `https://xmind.ai/share/TllsZOeX`
+- https://nguynnga23.github.io/SUBJECT-PROJECT__Software-Architecture-and-Design/docs/intro
+- https://telling-tray-627.notion.site/K-ch-b-n-Thuy-t-tr-nh-v-Demo-20-ph-t-1f644365a56880428d54cccc33219764
+- https://xmind.ai/share/TllsZOeX
 
 
 
