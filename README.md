@@ -2,6 +2,7 @@
 
 ## 1. Giới thiệu
 Dự án này bao gồm các service sau:
+- **Config Service** (Eureka Server)
 - **Discovery Service** (Eureka Server)
 - **Gateway Service** (API Gateway)
 - **User Service**
@@ -107,7 +108,6 @@ Mở trình duyệt và truy cập **http://localhost:8761**, đảm bảo tất
 - **Borrowing Service**: http://localhost:8083/swagger-ui/index.html
 - **Inventory Service**: http://localhost:8084/swagger-ui/index.html
 - **Notification Service**: http://localhost:8085/swagger-ui/index.html
-- **Recommendation Service**: http://localhost:8086/swagger-ui/index.html
 
 ### 5.2. Kiểm tra API qua Gateway
 
@@ -118,12 +118,13 @@ curl -X GET http://localhost:8080/api/v1/book-service/books  # Gửi request đ�
 curl -X GET http://localhost:8080/api/v1/borrowing-service/borrow-requests  # Gửi request đến Borrowing Service qua Gateway
 curl -X GET http://localhost:8080/api/v1/inventory-service/inventory  # Gửi request đến Inventory Service qua Gateway
 curl -X GET http://localhost:8080/api/v1/notification-service/notifications  # Gửi request đến Notification Service qua Gateway
-curl -X GET http://localhost:8080/api/v1/recommendation-service  # Gửi request đến Notification Service qua Gateway
 
 ```
-## 6. Đóng góp
+## 6. Tài liệu liên quan
+- `https://nguynnga23.github.io/SUBJECT-PROJECT__Software-Architecture-and-Design/docs/intro`
+- `https://telling-tray-627.notion.site/K-ch-b-n-Thuy-t-tr-nh-v-Demo-20-ph-t-1f644365a56880428d54cccc33219764`
+- `https://xmind.ai/share/TllsZOeX`
 
-Nếu bạn gặp lỗi hoặc muốn đóng góp cải tiến, hãy tạo Pull Request hoặc mở Issue trên repository của nhóm.
 
 
 
